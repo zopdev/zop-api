@@ -29,15 +29,14 @@ func (h *Handler) AddCloudAccount(ctx *gofr.Context) (interface{}, error) {
 
 	err := ctx.Bind(&cloudAccount)
 	if err != nil {
-		return nil, err
+		ctx.Logger.Error(err.Error())
+		return nil, http.ErrorInvalidParam{Params: []string{"body"}}
 	}
 
 	err = validateCloudAccount(&cloudAccount)
 	if err != nil {
 		return nil, err
 	}
-
-	cloudAccount.Name = strings.TrimSpace(cloudAccount.Name)
 
 	resp, err := h.service.AddCloudAccount(ctx, &cloudAccount)
 	if err != nil {
@@ -61,7 +60,9 @@ func (h *Handler) ListCloudAccounts(ctx *gofr.Context) (interface{}, error) {
 func validateCloudAccount(cloudAccount *store.CloudAccount) error {
 	params := []string{}
 
-	if strings.TrimSpace(cloudAccount.Name) == "" {
+	cloudAccount.Name = strings.TrimSpace(cloudAccount.Name)
+
+	if cloudAccount.Name == "" {
 		params = append(params, "name")
 	}
 

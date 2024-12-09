@@ -27,7 +27,7 @@ func (s *Service) AddCloudAccount(ctx *gofr.Context, cloudAccount *store.CloudAc
 	//nolint:gocritic //addition of more providers
 	switch strings.ToUpper(cloudAccount.Provider) {
 	case gcp:
-		err := fetchGCPProviderDetails(cloudAccount)
+		err := fetchGCPProviderDetails(ctx, cloudAccount)
 		if err != nil {
 			return nil, err
 		}
@@ -55,12 +55,13 @@ func (s *Service) FetchAllCloudAccounts(ctx *gofr.Context) ([]store.CloudAccount
 }
 
 // fetchGCPProviderDetails retrieves and assigns GCP details for a cloud account.
-func fetchGCPProviderDetails(cloudAccount *store.CloudAccount) error {
+func fetchGCPProviderDetails(ctx *gofr.Context, cloudAccount *store.CloudAccount) error {
 	var gcpCred gcpCredentials
 
 	body, err := json.Marshal(cloudAccount.Credentials)
 	if err != nil {
-		return err
+		ctx.Logger.Error(err.Error())
+		return http.ErrorInvalidParam{}
 	}
 
 	err = json.Unmarshal(body, &gcpCred)
