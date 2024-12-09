@@ -1,0 +1,15 @@
+.DS_store
+.idea
+.vscode
+migrations/build/
+
+configs/.local.env
+z-infra/gcp/credentials
+coverage.txt
+sonar-project.properties
+.idea
+.scannerwork
+
+*.db
+*.out
+*.html
