@@ -9,5 +9,6 @@ func All() map[int64]migration.Migrate {
 	return map[int64]migration.Migrate{
 
 		20241209162239: createCloudAccountTable(),
+		20241211121223: createAPPlicationTable(),
 	}
 }
