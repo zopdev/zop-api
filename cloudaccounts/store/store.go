@@ -93,3 +93,52 @@ func (*Store) GetCloudAccountByProvider(ctx *gofr.Context, providerType, provide
 
 	return &cloudAccount, nil
 }
+
+// GetCloudAccountByID retrieves a cloud account by id
+func (*Store) GetCloudAccountByID(ctx *gofr.Context, cloudAccountID int) (*CloudAccount, error) {
+	row := ctx.SQL.QueryRowContext(ctx, GETBYPROVIDERIDQUERY, cloudAccountID)
+
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	cloudAccount := CloudAccount{}
+
+	var providerDetails sql.NullString
+
+	err := row.Scan(&cloudAccount.ID, &cloudAccount.Name, &cloudAccount.Provider, &cloudAccount.ProviderID,
+		&providerDetails, &cloudAccount.CreatedAt, &cloudAccount.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	if providerDetails.Valid {
+		cloudAccount.ProviderDetails = providerDetails.String
+	}
+
+	return &cloudAccount, nil
+}
+
+func (*Store) GetCredentials(ctx *gofr.Context, cloudAccountID int64) (interface{}, error) {
+	row := ctx.SQL.QueryRowContext(ctx, GETCREDENTIALSQUERY, cloudAccountID)
+
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var credentials string
+
+	err := row.Scan(&credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	var jsonCred map[string]string
+
+	err = json.Unmarshal([]byte(credentials), &jsonCred)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonCred, nil
+}

@@ -1,10 +1,10 @@
-package store
+package service
 
-type Environment struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"Name"`
-	Level         int    `json:"Level"`
-	ApplicationID int64  `json:"ApplicationID"`
+import "github.com/zopdev/zop-api/applications/store"
+
+type Application struct {
+	ID   int64  `json:"ID"`
+	Name string `json:"name"`
 
 	// CreatedAt is the timestamp of when the cloud account was created.
 	CreatedAt string `json:"createdAt"`
@@ -14,4 +14,6 @@ type Environment struct {
 
 	// DeletedAt is the timestamp of when the cloud account was deleted, if applicable.
 	DeletedAt string `json:"deletedAt,omitempty"`
+
+	Environments []store.Environment `json:"environments"`
 }

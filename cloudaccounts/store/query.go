@@ -7,4 +7,8 @@ const (
 	GETBYPROVIDERQUERY = "SELECT id, name, provider, provider_id, provider_details, created_at," +
 		" updated_at FROM cloud_account WHERE provider = ? " +
 		"AND provider_id = ? AND deleted_at IS NULL;"
+	GETBYPROVIDERIDQUERY = "SELECT id, name, provider, provider_id, provider_details, created_at," +
+		" updated_at FROM cloud_account WHERE " +
+		"id = ? AND deleted_at IS NULL;"
+	GETCREDENTIALSQUERY = "SELECT credentials from cloud_account WHERE id = ? AND deleted_at IS NULL;"
 )

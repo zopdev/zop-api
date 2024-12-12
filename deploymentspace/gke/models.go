@@ -1,4 +1,4 @@
-package service
+package gke
 
 type gcpCredentials struct {
 	Type                    string `json:"type"`
@@ -12,9 +12,4 @@ type gcpCredentials struct {
 	AuthProviderX509CertURL string `json:"auth_provider_x509_cert_url"`
 	ClientX509CertURL       string `json:"client_x509_cert_url"`
 	UniverseDomain          string `json:"universe_domain"`
-}
-
-type DeploymentSpaceOptions struct {
-	Name string
-	PATH string
 }

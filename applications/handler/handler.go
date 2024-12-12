@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/zopdev/zop-api/applications/service"
@@ -47,6 +48,23 @@ func (h *Handler) ListApplications(ctx *gofr.Context) (interface{}, error) {
 	}
 
 	return applications, nil
+}
+
+func (h *Handler) GetApplication(ctx *gofr.Context) (interface{}, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	applicationId, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	res, err := h.service.GetApplication(ctx, applicationId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func validateApplication(application *store.Application) error {

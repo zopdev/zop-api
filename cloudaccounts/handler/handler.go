@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"strconv"
 	"strings"
 
 	"gofr.dev/pkg/gofr"
@@ -54,6 +55,64 @@ func (h *Handler) ListCloudAccounts(ctx *gofr.Context) (interface{}, error) {
 	}
 
 	return resp, nil
+}
+
+func (h *Handler) ListDeploymentSpace(ctx *gofr.Context) (interface{}, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	cloudAccountId, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	res, err := h.service.FetchDeploymentSpace(ctx, cloudAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *Handler) ListNamespaces(ctx *gofr.Context) (interface{}, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	cloudAccountId, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	clusterName := strings.TrimSpace(ctx.Param("name"))
+	clusterRegion := strings.TrimSpace(ctx.Param("region"))
+
+	if clusterName == "" || clusterRegion == "" {
+		return nil, http.ErrorInvalidParam{Params: []string{"cluster"}}
+	}
+
+	res, err := h.service.ListNamespaces(ctx, cloudAccountId, clusterName, clusterRegion)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *Handler) ListDeploymentSpaceOptions(ctx *gofr.Context) (interface{}, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	cloudAccountId, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	res, err := h.service.FetchDeploymentSpaceOptions(ctx, cloudAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 // validateCloudAccount checks the required fields and values in a CloudAccount.

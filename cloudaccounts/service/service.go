@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/zopdev/zop-api/deploymentspace"
 	"strings"
 	"time"
 
@@ -14,12 +16,13 @@ import (
 )
 
 type Service struct {
-	store store.CloudAccountStore
+	store           store.CloudAccountStore
+	deploymentSpace deploymentspace.ClusterService
 }
 
 // New creates a new CloudAccountService with the provided CloudAccountStore.
-func New(clStore store.CloudAccountStore) CloudAccountService {
-	return &Service{store: clStore}
+func New(clStore store.CloudAccountStore, deploySpace deploymentspace.ClusterService) CloudAccountService {
+	return &Service{store: clStore, deploymentSpace: deploySpace}
 }
 
 // AddCloudAccount adds a new cloud account to the store if it doesn't already exist.
@@ -76,4 +79,72 @@ func fetchGCPProviderDetails(ctx *gofr.Context, cloudAccount *store.CloudAccount
 	cloudAccount.ProviderID = gcpCred.ProjectID
 
 	return nil
+}
+
+func (s *Service) FetchDeploymentSpace(ctx *gofr.Context, cloudAccountID int) (interface{}, error) {
+	cloudAccount, err := s.store.GetCloudAccountByID(ctx, cloudAccountID)
+	if err != nil {
+		return nil, err
+	}
+
+	credentials, err := s.store.GetCredentials(ctx, cloudAccount.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	deploymentSpaceAccount := deploymentspace.CloudAccount{
+		ID:              cloudAccount.ID,
+		Name:            cloudAccount.Name,
+		Provider:        cloudAccount.Provider,
+		ProviderID:      cloudAccount.ProviderID,
+		ProviderDetails: cloudAccount.ProviderDetails,
+	}
+
+	clusters, err := s.deploymentSpace.ListAllClusters(ctx, &deploymentSpaceAccount, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return clusters, nil
+}
+
+func (s *Service) ListNamespaces(ctx *gofr.Context, id int, clusterName, clusterRegion string) (interface{}, error) {
+	cloudAccount, err := s.store.GetCloudAccountByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	credentials, err := s.store.GetCredentials(ctx, cloudAccount.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	deploymentSpaceAccount := deploymentspace.CloudAccount{
+		ID:              cloudAccount.ID,
+		Name:            cloudAccount.Name,
+		Provider:        cloudAccount.Provider,
+		ProviderID:      cloudAccount.ProviderID,
+		ProviderDetails: cloudAccount.ProviderDetails,
+	}
+
+	cluster := deploymentspace.Cluster{
+		Name:   clusterName,
+		Region: clusterRegion,
+	}
+
+	res, err := s.deploymentSpace.ListNamespace(ctx, &cluster, &deploymentSpaceAccount, credentials)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (s *Service) FetchDeploymentSpaceOptions(_ *gofr.Context, id int) ([]DeploymentSpaceOptions, error) {
+	options := []DeploymentSpaceOptions{
+		{Name: "Kubernetes CLuster",
+			PATH: fmt.Sprintf("/cloud-accounts/%v/deployment-space/clusters", id)},
+	}
+
+	return options, nil
 }
