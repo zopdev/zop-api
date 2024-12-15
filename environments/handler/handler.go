@@ -20,12 +20,22 @@ func New(svc service.EnvironmentService) *Handler {
 }
 
 func (h *Handler) AddEnvironment(ctx *gofr.Context) (interface{}, error) {
-	environment := store.Environment{}
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
 
-	err := ctx.Bind(&environment)
+	applicationID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
+
+	environment := store.Environment{}
+
+	err = ctx.Bind(&environment)
+	if err != nil {
+		return nil, err
+	}
+
+	environment.ApplicationID = int64(applicationID)
 
 	err = validateEnvironment(&environment)
 	if err != nil {
@@ -85,10 +95,6 @@ func validateEnvironment(environment *store.Environment) error {
 
 	if environment.Name == "" {
 		params = append(params, "name")
-	}
-
-	if environment.ID == 0 {
-		params = append(params, "id")
 	}
 
 	if environment.ApplicationID == 0 {

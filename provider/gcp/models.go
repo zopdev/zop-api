@@ -1,4 +1,4 @@
-package gke
+package gcp
 
 type gcpCredentials struct {
 	Type                    string `json:"type"`

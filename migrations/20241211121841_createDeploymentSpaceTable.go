@@ -12,8 +12,8 @@ func createDeploymentSpaceTable() migration.Migrate {
 					id INTEGER PRIMARY KEY AUTOINCREMENT,
 					type VARCHAR(255) NOT NULL,
 				    environment_id INTEGER NOT NULL,
-				    cloudaccount_id INTEGER NOT NULL,
-				    details TEXT NOT NULL,
+				    cloud_account_id INTEGER NOT NULL,
+				    details TEXT,
 					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 					deleted_at TIMESTAMP

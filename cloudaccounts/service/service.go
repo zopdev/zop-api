@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/zopdev/zop-api/deploymentspace"
+	"github.com/zopdev/zop-api/provider"
 	"strings"
 	"time"
 
@@ -17,11 +17,11 @@ import (
 
 type Service struct {
 	store           store.CloudAccountStore
-	deploymentSpace deploymentspace.ClusterService
+	deploymentSpace provider.Provider
 }
 
 // New creates a new CloudAccountService with the provided CloudAccountStore.
-func New(clStore store.CloudAccountStore, deploySpace deploymentspace.ClusterService) CloudAccountService {
+func New(clStore store.CloudAccountStore, deploySpace provider.Provider) CloudAccountService {
 	return &Service{store: clStore, deploymentSpace: deploySpace}
 }
 
@@ -92,7 +92,7 @@ func (s *Service) FetchDeploymentSpace(ctx *gofr.Context, cloudAccountID int) (i
 		return nil, err
 	}
 
-	deploymentSpaceAccount := deploymentspace.CloudAccount{
+	deploymentSpaceAccount := provider.CloudAccount{
 		ID:              cloudAccount.ID,
 		Name:            cloudAccount.Name,
 		Provider:        cloudAccount.Provider,
@@ -119,7 +119,7 @@ func (s *Service) ListNamespaces(ctx *gofr.Context, id int, clusterName, cluster
 		return nil, err
 	}
 
-	deploymentSpaceAccount := deploymentspace.CloudAccount{
+	deploymentSpaceAccount := provider.CloudAccount{
 		ID:              cloudAccount.ID,
 		Name:            cloudAccount.Name,
 		Provider:        cloudAccount.Provider,
@@ -127,7 +127,7 @@ func (s *Service) ListNamespaces(ctx *gofr.Context, id int, clusterName, cluster
 		ProviderDetails: cloudAccount.ProviderDetails,
 	}
 
-	cluster := deploymentspace.Cluster{
+	cluster := provider.Cluster{
 		Name:   clusterName,
 		Region: clusterRegion,
 	}
@@ -142,8 +142,9 @@ func (s *Service) ListNamespaces(ctx *gofr.Context, id int, clusterName, cluster
 
 func (s *Service) FetchDeploymentSpaceOptions(_ *gofr.Context, id int) ([]DeploymentSpaceOptions, error) {
 	options := []DeploymentSpaceOptions{
-		{Name: "Kubernetes CLuster",
-			PATH: fmt.Sprintf("/cloud-accounts/%v/deployment-space/clusters", id)},
+		{Name: "gke",
+			PATH: fmt.Sprintf("/cloud-accounts/%v/deployment-space/clusters", id),
+			Type: "type"},
 	}
 
 	return options, nil

@@ -1,18 +1,24 @@
 package main
 
 import (
-	"github.com/zopdev/zop-api/cloudaccounts/handler"
-	"github.com/zopdev/zop-api/cloudaccounts/service"
-	"github.com/zopdev/zop-api/cloudaccounts/store"
-	"github.com/zopdev/zop-api/deploymentspace/gke"
-
 	appHandler "github.com/zopdev/zop-api/applications/handler"
 	appService "github.com/zopdev/zop-api/applications/service"
 	appStore "github.com/zopdev/zop-api/applications/store"
+	"github.com/zopdev/zop-api/cloudaccounts/handler"
+	"github.com/zopdev/zop-api/cloudaccounts/service"
+	"github.com/zopdev/zop-api/cloudaccounts/store"
+	clusterStore "github.com/zopdev/zop-api/deploymentspace/cluster/store"
+	"github.com/zopdev/zop-api/provider/gcp"
 
 	envHandler "github.com/zopdev/zop-api/environments/handler"
 	envService "github.com/zopdev/zop-api/environments/service"
 	envStore "github.com/zopdev/zop-api/environments/store"
+
+	deployHandler "github.com/zopdev/zop-api/deploymentspace/handler"
+	deployService "github.com/zopdev/zop-api/deploymentspace/service"
+	deployStore "github.com/zopdev/zop-api/deploymentspace/store"
+
+	clService "github.com/zopdev/zop-api/deploymentspace/cluster/service"
 
 	"github.com/zopdev/zop-api/migrations"
 	"gofr.dev/pkg/gofr"
@@ -23,14 +29,21 @@ func main() {
 
 	app.Migrate(migrations.All())
 
-	gkeSvc := gke.New()
+	gkeSvc := gcp.New()
 
 	cloudAccountStore := store.New()
 	cloudAccountService := service.New(cloudAccountStore, gkeSvc)
 	cloudAccountHandler := handler.New(cloudAccountService)
 
+	deploymentStore := deployStore.New()
+	clusterStore := clusterStore.New()
+	clusterService := clService.New(clusterStore)
+	deploymentService := deployService.New(deploymentStore, clusterService)
+
+	deployHandler := deployHandler.New(deploymentService)
+
 	environmentStore := envStore.New()
-	environmentService := envService.New(environmentStore)
+	environmentService := envService.New(environmentStore, deploymentService)
 	envrionmentHandler := envHandler.New(environmentService)
 
 	applicationStore := appStore.New()
@@ -47,9 +60,11 @@ func main() {
 	app.GET("/applications", applicationHandler.ListApplications)
 	app.GET("/applications/{id}", applicationHandler.GetApplication)
 
-	app.POST("/environments", envrionmentHandler.AddEnvironment)
+	app.POST("/applications/{id}/environments", envrionmentHandler.AddEnvironment)
 	app.PATCH("/environments", envrionmentHandler.UpdateEnvironments)
 	app.GET("/applications/{id}/environments", envrionmentHandler.ListEnvironments)
+
+	app.POST("/environments/{id}/deploymentspace", deployHandler.Add)
 
 	app.Run()
 }

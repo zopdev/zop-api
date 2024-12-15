@@ -1,13 +1,10 @@
 package store
 
-type Environment struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	Level         int    `json:"level"`
-	ApplicationID int64  `json:"applicationId"`
-
-	DeploymentSpace any `json:"deploymentSpace"`
-
+type DeploymentSpace struct {
+	ID             int64  `json:"id"`
+	CloudAccountID int64  `json:"cloud_account_id"`
+	EnvironmentID  int64  `json:"environment_id"`
+	Type           string `json:"type"`
 	// CreatedAt is the timestamp of when the cloud account was created.
 	CreatedAt string `json:"createdAt"`
 
