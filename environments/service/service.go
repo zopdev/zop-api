@@ -24,7 +24,7 @@ func New(enStore store.EnvironmentStore, deploySvc service.DeploymentSpaceServic
 func (s *Service) AddEnvironment(ctx *gofr.Context, environemt *store.Environment) (*store.Environment, error) {
 	tempEnvironment, err := s.store.GetEnvironmentByName(ctx, int(environemt.ApplicationID), environemt.Name)
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
+		if !errors.Is(err, sql.ErrNoRows) && err != nil {
 			return nil, err
 		}
 	}
@@ -46,7 +46,7 @@ func (s *Service) FetchAllEnvironments(ctx *gofr.Context, applicationID int) ([]
 
 	for i := range environments {
 		deploymentSpace, err := s.deploymentSpaceService.FetchDeploymentSpace(ctx, int(environments[i].ID))
-		if !errors.Is(err, sql.ErrNoRows) {
+		if !errors.Is(err, sql.ErrNoRows) && err != nil {
 			return nil, err
 		}
 

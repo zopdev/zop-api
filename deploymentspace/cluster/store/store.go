@@ -27,7 +27,7 @@ func (s *Store) GetByDeploymentSpaceID(ctx *gofr.Context, deploymentSpaceID int)
 	cluster := Cluster{}
 
 	err := ctx.SQL.QueryRowContext(ctx, GETQUERY, deploymentSpaceID).Scan(&cluster.ID, &cluster.DeploymentSpaceID, &cluster.Identifier,
-		&cluster.Name, &cluster.Region, &cluster.ProviderID, &cluster.Provider, &cluster.Namespace.Name)
+		&cluster.Name, &cluster.Region, &cluster.ProviderID, &cluster.Provider, &cluster.Namespace.Name, &cluster.CreatedAt, &cluster.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

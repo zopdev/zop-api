@@ -1,7 +1,9 @@
 package service
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"github.com/zopdev/zop-api/deploymentspace"
 	"github.com/zopdev/zop-api/deploymentspace/store"
 
@@ -70,7 +72,9 @@ func (s *Service) FetchDeploymentSpace(ctx *gofr.Context, environmentID int) (*D
 
 	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
 	if err != nil {
-		return nil, err
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
 	}
 
 	return &DeploymentSpaceResp{
