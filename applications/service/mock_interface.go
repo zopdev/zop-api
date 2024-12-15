@@ -64,3 +64,18 @@ func (mr *MockApplicationServiceMockRecorder) FetchAllApplications(ctx interface
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchAllApplications", reflect.TypeOf((*MockApplicationService)(nil).FetchAllApplications), ctx)
 }
+
+// GetApplication mocks base method.
+func (m *MockApplicationService) GetApplication(ctx *gofr.Context, id int) (*store.Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetApplication", ctx, id)
+	ret0, _ := ret[0].(*store.Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetApplication indicates an expected call of GetApplication.
+func (mr *MockApplicationServiceMockRecorder) GetApplication(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplication", reflect.TypeOf((*MockApplicationService)(nil).GetApplication), ctx, id)
+}

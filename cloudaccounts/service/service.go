@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/zopdev/zop-api/provider"
 	"strings"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"gofr.dev/pkg/gofr/http"
 
 	"github.com/zopdev/zop-api/cloudaccounts/store"
+	"github.com/zopdev/zop-api/provider"
 )
 
 type Service struct {
@@ -140,7 +140,7 @@ func (s *Service) ListNamespaces(ctx *gofr.Context, id int, clusterName, cluster
 	return res, nil
 }
 
-func (s *Service) FetchDeploymentSpaceOptions(_ *gofr.Context, id int) ([]DeploymentSpaceOptions, error) {
+func (*Service) FetchDeploymentSpaceOptions(_ *gofr.Context, id int) ([]DeploymentSpaceOptions, error) {
 	options := []DeploymentSpaceOptions{
 		{Name: "gke",
 			PATH: fmt.Sprintf("/cloud-accounts/%v/deployment-space/clusters", id),

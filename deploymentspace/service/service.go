@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+
 	"github.com/zopdev/zop-api/deploymentspace"
 	"github.com/zopdev/zop-api/deploymentspace/store"
 
@@ -18,8 +19,8 @@ type Service struct {
 	clusterService deploymentspace.DeploymentSpace
 }
 
-func New(store store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentSpace) DeploymentSpaceService {
-	return &Service{store: store, clusterService: clusterSvc}
+func New(str store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentSpace) DeploymentSpaceService {
+	return &Service{store: str, clusterService: clusterSvc}
 }
 
 func (s *Service) AddDeploymentSpace(ctx *gofr.Context, deploymentSpace *DeploymentSpace, environmentID int) (*DeploymentSpace, error) {
@@ -39,6 +40,7 @@ func (s *Service) AddDeploymentSpace(ctx *gofr.Context, deploymentSpace *Deploym
 	}
 
 	cl := clusterStore.Cluster{}
+
 	bytes, err := json.Marshal(deploymentSpace.DeploymentSpace)
 	if err != nil {
 		return nil, err
@@ -77,8 +79,20 @@ func (s *Service) FetchDeploymentSpace(ctx *gofr.Context, environmentID int) (*D
 		}
 	}
 
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	cluster := store.Cluster{}
+
+	err = json.Unmarshal(bytes, &cluster)
+	if err != nil {
+		return nil, err
+	}
+
 	return &DeploymentSpaceResp{
 		DeploymentSpace: deploymentSpace,
-		Cluster:         resp,
+		Cluster:         &cluster,
 	}, nil
 }

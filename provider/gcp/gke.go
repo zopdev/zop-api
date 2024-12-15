@@ -1,31 +1,44 @@
+// Package gcp provides an implementation of the Provider interface for interacting with
+// Google Cloud Platform (GCP) resources such as GKE clusters and namespaces.
+//
+// It implements methods to list all clusters and namespaces in a GKE cluster using GCP credentials,
+// and returns responses in the format expected by the `provider` package.
 package gcp
 
 import (
-	"cloud.google.com/go/container/apiv1/containerpb"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+
+	"cloud.google.com/go/container/apiv1/containerpb"
+
 	"github.com/zopdev/zop-api/provider"
+
 	"gofr.dev/pkg/gofr"
+
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
-	"io/ioutil"
-	"net/http"
 
 	container "cloud.google.com/go/container/apiv1"
 
-	container2 "google.golang.org/api/container/v1"
+	apiContainer "google.golang.org/api/container/v1"
 )
 
+// GCP implements the provider.Provider interface for Google Cloud Platform.
 type GCP struct {
 }
 
+// New initializes and returns a new GCP provider.
 func New() provider.Provider {
 	return &GCP{}
 }
 
+// ListAllClusters lists all clusters available for a given cloud account in GCP.
+// It uses the GCP credentials to authenticate and fetch the cluster details.
 func (g *GCP) ListAllClusters(ctx *gofr.Context, cloudAccount *provider.CloudAccount,
 	credentials interface{}) (*provider.ClusterResponse, error) {
 	credBody, err := g.getCredGCP(credentials)
@@ -87,12 +100,13 @@ func (g *GCP) ListAllClusters(ctx *gofr.Context, cloudAccount *provider.CloudAcc
 			},
 		},
 	}
+
 	return response, nil
 }
 
+// ListNamespace fetches namespaces from the Kubernetes API for a given GKE cluster.
 func (g *GCP) ListNamespace(ctx *gofr.Context, cluster *provider.Cluster,
 	cloudAccount *provider.CloudAccount, credentials interface{}) (interface{}, error) {
-
 	// Step 1: Get GCP credentials
 	credBody, err := g.getCredGCP(credentials)
 	if err != nil {
@@ -113,6 +127,7 @@ func (g *GCP) ListNamespace(ctx *gofr.Context, cluster *provider.Cluster,
 
 	// Step 4: Fetch namespaces from the Kubernetes API
 	apiEndpoint := fmt.Sprintf("https://%s/api/v1/namespaces", gkeCluster.Endpoint)
+
 	namespaces, err := g.fetchNamespaces(ctx, client, credBody, apiEndpoint)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch namespaces: %w", err)
@@ -121,11 +136,11 @@ func (g *GCP) ListNamespace(ctx *gofr.Context, cluster *provider.Cluster,
 	return namespaces, nil
 }
 
-func (g *GCP) getClusterInfo(ctx *gofr.Context, cluster *provider.Cluster,
-	cloudAccount *provider.CloudAccount, credBody []byte) (*container2.Cluster, error) {
-
+// getClusterInfo retrieves detailed information about a specific GKE cluster.
+func (*GCP) getClusterInfo(ctx *gofr.Context, cluster *provider.Cluster,
+	cloudAccount *provider.CloudAccount, credBody []byte) (*apiContainer.Cluster, error) {
 	// Create the GCP Container service
-	containerService, err := container2.NewService(ctx, option.WithCredentialsJSON(credBody))
+	containerService, err := apiContainer.NewService(ctx, option.WithCredentialsJSON(credBody))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create container service: %w", err)
 	}
@@ -144,7 +159,8 @@ func (g *GCP) getClusterInfo(ctx *gofr.Context, cluster *provider.Cluster,
 	return gkeCluster, nil
 }
 
-func (g *GCP) createTLSConfiguredClient(caCertificate string) (*http.Client, error) {
+// createTLSConfiguredClient creates an HTTP client with custom TLS configuration using the provided CA certificate.
+func (*GCP) createTLSConfiguredClient(caCertificate string) (*http.Client, error) {
 	// Decode the Base64-encoded CA certificate
 	caCertBytes, err := base64.StdEncoding.DecodeString(caCertificate)
 	if err != nil {
@@ -154,10 +170,10 @@ func (g *GCP) createTLSConfiguredClient(caCertificate string) (*http.Client, err
 	// Create a CA certificate pool
 	caCertPool := x509.NewCertPool()
 	if !caCertPool.AppendCertsFromPEM(caCertBytes) {
-		return nil, fmt.Errorf("failed to append CA certificate to pool")
+		return nil, err
 	}
 
-	// Create a custom HTTP client with the CA certificate
+	//nolint:gosec //Create a custom HTTP client with the CA certificate
 	tlsConfig := &tls.Config{
 		RootCAs: caCertPool,
 	}
@@ -170,7 +186,9 @@ func (g *GCP) createTLSConfiguredClient(caCertificate string) (*http.Client, err
 	return client, nil
 }
 
-func (g *GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody []byte, apiEndpoint string) (*provider.NamespaceResponse, error) {
+// fetchNamespaces fetches Kubernetes namespaces from the specified API endpoint using the provided HTTP client.
+func (*GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody []byte,
+	apiEndpoint string) (*provider.NamespaceResponse, error) {
 	// Generate a JWT token from the credentials
 	config, err := google.JWTConfigFromJSON(credBody, "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
@@ -183,15 +201,19 @@ func (g *GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody [
 	// Get a token
 	token, err := tokenSource.Token()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get token: %w", err)
+		ctx.Logger.Errorf("failed to get token: %v", err)
+		return nil, err
 	}
 
 	// Make a request to the Kubernetes API to list namespaces
-	req, err := http.NewRequest("GET", apiEndpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiEndpoint, http.NoBody)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		ctx.Logger.Errorf("failed to create request: %w", err)
+		return nil, err
 	}
+
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+
 	req.Header.Set("Accept", "application/json")
 
 	resp, err := client.Do(req)
@@ -202,12 +224,15 @@ func (g *GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody [
 
 	// Handle unexpected status codes
 	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
-		return nil, fmt.Errorf("unexpected response: %s", body)
+		body, _ := io.ReadAll(resp.Body)
+
+		ctx.Logger.Errorf("API call failed with status code %d: %s", resp.StatusCode, body)
+
+		return nil, err
 	}
 
 	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
@@ -220,12 +245,14 @@ func (g *GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody [
 			} `json:"metadata"`
 		} `json:"items"`
 	}
+
 	if err := json.Unmarshal(body, &namespaceResponse); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
 	// Extract namespace names
-	var namespaces []provider.Namespace
+	namespaces := []provider.Namespace{}
+
 	for _, item := range namespaceResponse.Items {
 		namespace := provider.Namespace{
 			Name: item.Metadata.Name,
@@ -240,7 +267,8 @@ func (g *GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody [
 	}, nil
 }
 
-func (g *GCP) getCredGCP(credentials any) ([]byte, error) {
+// getCredGCP extracts and marshals the credentials into the appropriate format for GCP authentication.
+func (*GCP) getCredGCP(credentials any) ([]byte, error) {
 	var cred gcpCredentials
 
 	credBody, err := json.Marshal(credentials)
@@ -256,7 +284,8 @@ func (g *GCP) getCredGCP(credentials any) ([]byte, error) {
 	return json.Marshal(cred)
 }
 
-func (g *GCP) getClusterManagerClientGCP(ctx *gofr.Context, credentials []byte) (*container.ClusterManagerClient, error) {
+// getClusterManagerClientGCP creates a client for interacting with the GKE Cluster Manager API.
+func (*GCP) getClusterManagerClientGCP(ctx *gofr.Context, credentials []byte) (*container.ClusterManagerClient, error) {
 	client, err := container.NewClusterManagerClient(ctx, option.WithCredentialsJSON(credentials))
 	if err != nil {
 		return nil, err

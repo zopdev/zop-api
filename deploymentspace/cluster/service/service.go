@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+
 	"github.com/zopdev/zop-api/deploymentspace"
 	"github.com/zopdev/zop-api/deploymentspace/cluster/store"
 	"gofr.dev/pkg/gofr"
@@ -11,9 +12,9 @@ type Service struct {
 	store store.ClusterStore
 }
 
-func New(store store.ClusterStore) deploymentspace.DeploymentSpace {
+func New(str store.ClusterStore) deploymentspace.DeploymentSpace {
 	return &Service{
-		store: store,
+		store: str,
 	}
 }
 
@@ -28,7 +29,12 @@ func (s *Service) FetchByDeploymentSpaceID(ctx *gofr.Context, id int) (interface
 
 func (s *Service) Add(ctx *gofr.Context, data any) (interface{}, error) {
 	bytes, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
 	cluster := store.Cluster{}
+
 	err = json.Unmarshal(bytes, &cluster)
 	if err != nil {
 		return nil, err

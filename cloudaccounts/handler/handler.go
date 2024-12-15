@@ -61,12 +61,12 @@ func (h *Handler) ListDeploymentSpace(ctx *gofr.Context) (interface{}, error) {
 	id := ctx.PathParam("id")
 	id = strings.TrimSpace(id)
 
-	cloudAccountId, err := strconv.Atoi(id)
+	cloudAccountID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
 	}
 
-	res, err := h.service.FetchDeploymentSpace(ctx, cloudAccountId)
+	res, err := h.service.FetchDeploymentSpace(ctx, cloudAccountID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (h *Handler) ListNamespaces(ctx *gofr.Context) (interface{}, error) {
 	id := ctx.PathParam("id")
 	id = strings.TrimSpace(id)
 
-	cloudAccountId, err := strconv.Atoi(id)
+	cloudAccountID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
 	}
@@ -90,7 +90,7 @@ func (h *Handler) ListNamespaces(ctx *gofr.Context) (interface{}, error) {
 		return nil, http.ErrorInvalidParam{Params: []string{"cluster"}}
 	}
 
-	res, err := h.service.ListNamespaces(ctx, cloudAccountId, clusterName, clusterRegion)
+	res, err := h.service.ListNamespaces(ctx, cloudAccountID, clusterName, clusterRegion)
 	if err != nil {
 		return nil, err
 	}
@@ -102,12 +102,12 @@ func (h *Handler) ListDeploymentSpaceOptions(ctx *gofr.Context) (interface{}, er
 	id := ctx.PathParam("id")
 	id = strings.TrimSpace(id)
 
-	cloudAccountId, err := strconv.Atoi(id)
+	cloudAccountID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
 	}
 
-	res, err := h.service.FetchDeploymentSpaceOptions(ctx, cloudAccountId)
+	res, err := h.service.FetchDeploymentSpaceOptions(ctx, cloudAccountID)
 	if err != nil {
 		return nil, err
 	}

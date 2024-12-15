@@ -8,7 +8,7 @@ func New() ClusterStore {
 	return &Store{}
 }
 
-func (s *Store) Insert(ctx *gofr.Context, cluster *Cluster) (*Cluster, error) {
+func (*Store) Insert(ctx *gofr.Context, cluster *Cluster) (*Cluster, error) {
 	res, err := ctx.SQL.ExecContext(ctx, INSERTQUERY, cluster.DeploymentSpaceID, cluster.Identifier,
 		cluster.Name, cluster.Region, cluster.ProviderID, cluster.Provider, cluster.Namespace.Name)
 	if err != nil {
@@ -23,7 +23,7 @@ func (s *Store) Insert(ctx *gofr.Context, cluster *Cluster) (*Cluster, error) {
 	return cluster, nil
 }
 
-func (s *Store) GetByDeploymentSpaceID(ctx *gofr.Context, deploymentSpaceID int) (*Cluster, error) {
+func (*Store) GetByDeploymentSpaceID(ctx *gofr.Context, deploymentSpaceID int) (*Cluster, error) {
 	cluster := Cluster{}
 
 	err := ctx.SQL.QueryRowContext(ctx, GETQUERY, deploymentSpaceID).Scan(&cluster.ID, &cluster.DeploymentSpaceID, &cluster.Identifier,

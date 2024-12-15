@@ -7,11 +7,24 @@ import (
 type Store struct {
 }
 
+// New creates and returns a new instance of EnvironmentStore.
+//
+// Returns:
+//   - EnvironmentStore: A new instance of the store implementation.
 func New() EnvironmentStore {
 	return &Store{}
 }
 
-func (*Store) InsertEnvironment(ctx *gofr.Context, environment *Environment) (*Environment, error) {
+// Insert inserts a new environment record into the datastore.
+//
+// Parameters:
+//   - ctx: The request context, which includes database connection and logging.
+//   - environment: A pointer to the Environment struct containing the details to be inserted.
+//
+// Returns:
+//   - *Environment: A pointer to the newly inserted environment record, including the generated ID.
+//   - error: An error if the operation fails.
+func (*Store) Insert(ctx *gofr.Context, environment *Environment) (*Environment, error) {
 	res, err := ctx.SQL.ExecContext(ctx, INSERTQUERY, environment.Name, environment.Level, environment.ApplicationID)
 	if err != nil {
 		return nil, err
@@ -22,7 +35,16 @@ func (*Store) InsertEnvironment(ctx *gofr.Context, environment *Environment) (*E
 	return environment, nil
 }
 
-func (*Store) GetALLEnvironments(ctx *gofr.Context, applicationID int) ([]Environment, error) {
+// GetALL retrieves all environments associated with a specific application.
+//
+// Parameters:
+//   - ctx: The request context, which includes database connection and logging.
+//   - applicationID: The unique identifier of the application whose environments need to be fetched.
+//
+// Returns:
+//   - []Environment: A slice of environments associated with the specified application.
+//   - error: An error if the operation fails or the query returns no results.
+func (*Store) GetALL(ctx *gofr.Context, applicationID int) ([]Environment, error) {
 	environments := []Environment{}
 
 	rows, err := ctx.SQL.QueryContext(ctx, GETALLQUERY, applicationID)
@@ -49,7 +71,17 @@ func (*Store) GetALLEnvironments(ctx *gofr.Context, applicationID int) ([]Enviro
 	return environments, nil
 }
 
-func (*Store) GetEnvironmentByName(ctx *gofr.Context, applicationID int, name string) (*Environment, error) {
+// GetByName retrieves a specific environment by its name for a given application.
+//
+// Parameters:
+//   - ctx: The request context, which includes database connection and logging.
+//   - applicationID: The unique identifier of the application to which the environment belongs.
+//   - name: The name of the environment to retrieve.
+//
+// Returns:
+//   - *Environment: A pointer to the environment matching the specified name.
+//   - error: An error if the operation fails or no environment is found.
+func (*Store) GetByName(ctx *gofr.Context, applicationID int, name string) (*Environment, error) {
 	row := ctx.SQL.QueryRowContext(ctx, GETBYNAMEQUERY, name, applicationID)
 	if row.Err() != nil {
 		return nil, row.Err()
@@ -66,7 +98,16 @@ func (*Store) GetEnvironmentByName(ctx *gofr.Context, applicationID int, name st
 	return &environment, nil
 }
 
-func (*Store) UpdateEnvironment(ctx *gofr.Context, environment *Environment) (*Environment, error) {
+// Update modifies an existing environment record in the datastore.
+//
+// Parameters:
+//   - ctx: The request context, which includes database connection and logging.
+//   - environment: A pointer to the Environment struct containing the updated details.
+//
+// Returns:
+//   - *Environment: A pointer to the updated environment record.
+//   - error: An error if the operation fails.
+func (*Store) Update(ctx *gofr.Context, environment *Environment) (*Environment, error) {
 	_, err := ctx.SQL.ExecContext(ctx, UPDATEQUERY, environment.Name, environment.Level, environment.ID)
 	if err != nil {
 		return nil, err

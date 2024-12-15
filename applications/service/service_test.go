@@ -11,6 +11,7 @@ import (
 	"gofr.dev/pkg/gofr"
 
 	"github.com/zopdev/zop-api/applications/store"
+	"github.com/zopdev/zop-api/environments/service"
 	"gofr.dev/pkg/gofr/http"
 )
 
@@ -23,6 +24,7 @@ func TestService_AddApplication(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockStore := store.NewMockApplicationStore(ctrl)
+	mockEvironmentService := service.NewMockEnvironmentService(ctrl)
 	ctx := &gofr.Context{}
 
 	application := &store.Application{
@@ -87,8 +89,8 @@ func TestService_AddApplication(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mockBehavior()
 
-			service := New(mockStore)
-			_, err := service.AddApplication(ctx, tc.input)
+			appService := New(mockStore, mockEvironmentService)
+			_, err := appService.AddApplication(ctx, tc.input)
 
 			if tc.expectedError != nil {
 				require.Error(t, err)
@@ -105,6 +107,8 @@ func TestService_FetchAllApplications(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockStore := store.NewMockApplicationStore(ctrl)
+	mockEvironmentService := service.NewMockEnvironmentService(ctrl)
+
 	ctx := &gofr.Context{}
 
 	expectedApplications := []store.Application{
@@ -144,8 +148,8 @@ func TestService_FetchAllApplications(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mockBehavior()
 
-			service := New(mockStore)
-			applications, err := service.FetchAllApplications(ctx)
+			appService := New(mockStore, mockEvironmentService)
+			applications, err := appService.FetchAllApplications(ctx)
 
 			if tc.expectedError != nil {
 				require.Error(t, err)

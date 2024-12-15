@@ -54,12 +54,12 @@ func (h *Handler) GetApplication(ctx *gofr.Context) (interface{}, error) {
 	id := ctx.PathParam("id")
 	id = strings.TrimSpace(id)
 
-	applicationId, err := strconv.Atoi(id)
+	applicationID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
 	}
 
-	res, err := h.service.GetApplication(ctx, applicationId)
+	res, err := h.service.GetApplication(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}

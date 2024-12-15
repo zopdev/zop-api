@@ -29,7 +29,6 @@ func TestHandler_AddCloudAccount(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockService := service.NewMockCloudAccountService(ctrl)
-
 	handler := New(mockService)
 
 	testCases := []struct {

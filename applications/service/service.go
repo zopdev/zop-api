@@ -1,11 +1,11 @@
 package service
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
-	"github.com/zopdev/zop-api/environments/service"
 
-	"database/sql"
+	"github.com/zopdev/zop-api/environments/service"
 
 	"github.com/zopdev/zop-api/applications/store"
 	"gofr.dev/pkg/gofr"
@@ -49,6 +49,7 @@ func (s *Service) AddApplication(ctx *gofr.Context, application *store.Applicati
 
 	for i := range environments {
 		environments[i].ApplicationID = application.ID
+
 		environment, err := s.store.InsertEnvironment(ctx, &environments[i])
 		if err != nil {
 			return nil, err
@@ -67,7 +68,7 @@ func (s *Service) FetchAllApplications(ctx *gofr.Context) ([]store.Application, 
 	}
 
 	for i := range applications {
-		environments, err := s.environmentService.FetchAllEnvironments(ctx, int(applications[i].ID))
+		environments, err := s.environmentService.FetchAll(ctx, int(applications[i].ID))
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +93,7 @@ func (s *Service) GetApplication(ctx *gofr.Context, id int) (*store.Application,
 		return nil, err
 	}
 
-	environments, err := s.environmentService.FetchAllEnvironments(ctx, id)
+	environments, err := s.environmentService.FetchAll(ctx, id)
 	if err != nil {
 		return nil, err
 	}

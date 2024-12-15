@@ -8,7 +8,7 @@ func New() DeploymentSpaceStore {
 	return &Store{}
 }
 
-func (s *Store) InsertDeploymentSpace(ctx *gofr.Context, deploymentSpace *DeploymentSpace) (*DeploymentSpace, error) {
+func (*Store) InsertDeploymentSpace(ctx *gofr.Context, deploymentSpace *DeploymentSpace) (*DeploymentSpace, error) {
 	res, err := ctx.SQL.ExecContext(ctx, INSERTQUERY, deploymentSpace.CloudAccountID, deploymentSpace.EnvironmentID, deploymentSpace.Type)
 	if err != nil {
 		return nil, err
@@ -22,11 +22,12 @@ func (s *Store) InsertDeploymentSpace(ctx *gofr.Context, deploymentSpace *Deploy
 	return deploymentSpace, nil
 }
 
-func (s *Store) GetDeploymentSpaceByEnvID(ctx *gofr.Context, environmentID int) (*DeploymentSpace, error) {
+func (*Store) GetDeploymentSpaceByEnvID(ctx *gofr.Context, environmentID int) (*DeploymentSpace, error) {
 	deploymentSpace := DeploymentSpace{}
 
-	err := ctx.SQL.QueryRowContext(ctx, GETQUERYBYENVID, environmentID).Scan(&deploymentSpace.ID, &deploymentSpace.CloudAccountID, &deploymentSpace.EnvironmentID,
-		&deploymentSpace.Type, &deploymentSpace.CreatedAt, &deploymentSpace.UpdatedAt)
+	err := ctx.SQL.QueryRowContext(ctx, GETQUERYBYENVID, environmentID).Scan(&deploymentSpace.ID,
+		&deploymentSpace.CloudAccountID, &deploymentSpace.EnvironmentID, &deploymentSpace.Type,
+		&deploymentSpace.CreatedAt, &deploymentSpace.UpdatedAt, &deploymentSpace.CloudAccountName)
 	if err != nil {
 		return nil, err
 	}

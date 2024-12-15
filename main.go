@@ -7,7 +7,7 @@ import (
 	"github.com/zopdev/zop-api/cloudaccounts/handler"
 	"github.com/zopdev/zop-api/cloudaccounts/service"
 	"github.com/zopdev/zop-api/cloudaccounts/store"
-	clusterStore "github.com/zopdev/zop-api/deploymentspace/cluster/store"
+	clStore "github.com/zopdev/zop-api/deploymentspace/cluster/store"
 	"github.com/zopdev/zop-api/provider/gcp"
 
 	envHandler "github.com/zopdev/zop-api/environments/handler"
@@ -36,11 +36,11 @@ func main() {
 	cloudAccountHandler := handler.New(cloudAccountService)
 
 	deploymentStore := deployStore.New()
-	clusterStore := clusterStore.New()
+	clusterStore := clStore.New()
 	clusterService := clService.New(clusterStore)
 	deploymentService := deployService.New(deploymentStore, clusterService)
 
-	deployHandler := deployHandler.New(deploymentService)
+	deploymentHandler := deployHandler.New(deploymentService)
 
 	environmentStore := envStore.New()
 	environmentService := envService.New(environmentStore, deploymentService)
@@ -60,11 +60,11 @@ func main() {
 	app.GET("/applications", applicationHandler.ListApplications)
 	app.GET("/applications/{id}", applicationHandler.GetApplication)
 
-	app.POST("/applications/{id}/environments", envrionmentHandler.AddEnvironment)
-	app.PATCH("/environments", envrionmentHandler.UpdateEnvironments)
-	app.GET("/applications/{id}/environments", envrionmentHandler.ListEnvironments)
+	app.POST("/applications/{id}/environments", envrionmentHandler.Add)
+	app.PATCH("/environments", envrionmentHandler.Update)
+	app.GET("/applications/{id}/environments", envrionmentHandler.List)
 
-	app.POST("/environments/{id}/deploymentspace", deployHandler.Add)
+	app.POST("/environments/{id}/deploymentspace", deploymentHandler.Add)
 
 	app.Run()
 }

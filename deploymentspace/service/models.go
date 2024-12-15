@@ -5,14 +5,14 @@ import (
 )
 
 type DeploymentSpaceResp struct {
-	DeploymentSpace *store.DeploymentSpace `json:"DeploymentSpace"`
-	Cluster         any                    `json:"Cluster"`
+	DeploymentSpace *store.DeploymentSpace `json:"deploymentSpace"`
+	Cluster         *store.Cluster         `json:"cluster"`
 }
 
 type DeploymentSpace struct {
-	CloudAccount    CloudAccount `json:"CloudAccount"`
-	Type            Type         `json:"Type"`
-	DeploymentSpace interface{}  `json:"DeploymentSpace"`
+	CloudAccount    CloudAccount `json:"cloudAccount"`
+	Type            Type         `json:"type"`
+	DeploymentSpace interface{}  `json:"deploymentSpace"`
 }
 
 type Type struct {

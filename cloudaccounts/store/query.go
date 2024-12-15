@@ -10,5 +10,6 @@ const (
 	GETBYPROVIDERIDQUERY = "SELECT id, name, provider, provider_id, provider_details, created_at," +
 		" updated_at FROM cloud_account WHERE " +
 		"id = ? AND deleted_at IS NULL;"
+	//nolint:gosec //query
 	GETCREDENTIALSQUERY = "SELECT credentials from cloud_account WHERE id = ? AND deleted_at IS NULL;"
 )
