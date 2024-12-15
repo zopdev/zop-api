@@ -21,13 +21,13 @@ type ClusterResponse struct {
 // It contains the name, path, and parameters required to get the next page of results.
 type NextPage struct {
 	// Name is the name of the next page.
-	Name string `json:"Name"`
+	Name string `json:"name"`
 
 	// Path is the URL path to the next page of results.
-	Path string `json:"Path"`
+	Path string `json:"path"`
 
 	// Params holds the parameters required to fetch the next page.
-	Params map[string]string `json:"Params"`
+	Params map[string]string `json:"params"`
 }
 
 // Cluster represents a cloud provider cluster, including details like its name,

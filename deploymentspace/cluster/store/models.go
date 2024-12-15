@@ -21,5 +21,5 @@ type Cluster struct {
 }
 
 type Namespace struct {
-	Name string `json:"Name"`
+	Name string `json:"name"`
 }
