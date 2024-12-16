@@ -2,6 +2,7 @@ package store
 
 import (
 	"gofr.dev/pkg/gofr"
+	"time"
 )
 
 type Store struct {
@@ -31,6 +32,8 @@ func (*Store) Insert(ctx *gofr.Context, environment *Environment) (*Environment,
 	}
 
 	environment.ID, _ = res.LastInsertId()
+
+	environment.CreatedAt = time.Now().UTC().Format(time.RFC3339)
 
 	return environment, nil
 }
@@ -114,4 +117,25 @@ func (*Store) Update(ctx *gofr.Context, environment *Environment) (*Environment,
 	}
 
 	return environment, nil
+}
+
+// GetMaxLevel retrieves the maximum environment `level` for a specified application from the `environment` table.
+// It considers only active records where `deleted_at IS NULL`.
+//
+// Parameters:
+//   - ctx (*gofr.Context): Context for request handling, logging, and tracing.
+//   - applicationID (int): The unique identifier for the application.
+//
+// Returns:
+//   - int: The highest environment level associated with the given application ID.
+//   - error: An error if the query fails or no matching data exists.
+func (*Store) GetMaxLevel(ctx *gofr.Context, applicationID int) (int, error) {
+	var maxLevel int
+
+	err := ctx.SQL.QueryRowContext(ctx, GETMAXLEVEL, applicationID).Scan(&maxLevel)
+	if err != nil {
+		return 0, err
+	}
+
+	return maxLevel, nil
 }

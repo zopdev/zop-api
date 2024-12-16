@@ -3,8 +3,6 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"time"
-
 	"gofr.dev/pkg/gofr"
 	"gofr.dev/pkg/gofr/http"
 
@@ -43,8 +41,8 @@ func New(enStore store.EnvironmentStore, deploySvc service.DeploymentSpaceServic
 //   - error:
 //   - An error if the operation fails.
 //   - http.ErrorEntityAlreadyExist if the environment already exists.
-func (s *Service) Add(ctx *gofr.Context, environemt *store.Environment) (*store.Environment, error) {
-	tempEnvironment, err := s.store.GetByName(ctx, int(environemt.ApplicationID), environemt.Name)
+func (s *Service) Add(ctx *gofr.Context, environment *store.Environment) (*store.Environment, error) {
+	tempEnvironment, err := s.store.GetByName(ctx, int(environment.ApplicationID), environment.Name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) && err != nil {
 			return nil, err
@@ -55,9 +53,14 @@ func (s *Service) Add(ctx *gofr.Context, environemt *store.Environment) (*store.
 		return nil, http.ErrorEntityAlreadyExist{}
 	}
 
-	environemt.CreatedAt = time.Now().UTC().Format(time.RFC3339)
+	maxLevel, err := s.store.GetMaxLevel(ctx, int(environment.ApplicationID))
+	if err != nil {
+		return nil, err
+	}
 
-	return s.store.Insert(ctx, environemt)
+	environment.Level = maxLevel + 1
+
+	return s.store.Insert(ctx, environment)
 }
 
 // FetchAll retrieves all environments for a specific application and populates their deployment spaces.

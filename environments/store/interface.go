@@ -50,4 +50,16 @@ type EnvironmentStore interface {
 	//   - *Environment: A pointer to the updated environment record.
 	//   - error: An error if the operation fails.
 	Update(ctx *gofr.Context, environment *Environment) (*Environment, error)
+
+	// GetMaxLevel retrieves the maximum environment `level` for a specified application from the `environment` table.
+	// It considers only active records where `deleted_at IS NULL`.
+	//
+	// Parameters:
+	//   - ctx (*gofr.Context): Context for request handling, logging, and tracing.
+	//   - applicationID (int): The unique identifier for the application.
+	//
+	// Returns:
+	//   - int: The highest environment level associated with the given application ID.
+	//   - error: An error if the query fails or no matching data exists.
+	GetMaxLevel(ctx *gofr.Context, applicationID int) (int, error)
 }
