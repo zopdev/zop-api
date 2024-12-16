@@ -13,3 +13,9 @@ type gcpCredentials struct {
 	ClientX509CertURL       string `json:"client_x509_cert_url"`
 	UniverseDomain          string `json:"universe_domain"`
 }
+
+type DeploymentSpaceOptions struct {
+	Name string `json:"Name"`
+	PATH string `json:"PATH"`
+	Type string `json:"Type"`
+}
