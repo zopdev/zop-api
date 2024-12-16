@@ -3,8 +3,8 @@ package store
 type DeploymentSpace struct {
 	ID               int64  `json:"id"`
 	CloudAccountID   int64  `json:"cloud_account_id"`
-	CloudAccountName string `json:"cloud_account_name"`
 	EnvironmentID    int64  `json:"environment_id"`
+	CloudAccountName string `json:"cloud_account_name"`
 	Type             string `json:"type"`
 	// CreatedAt is the timestamp of when the cloud account was created.
 	CreatedAt string `json:"createdAt"`

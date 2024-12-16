@@ -22,6 +22,8 @@ type Environment struct {
 	Level         int    `json:"level"`
 	ApplicationID int64  `json:"applicationID"`
 
+	DeploymentSpace any `json:"deploymentSpace"`
+
 	// CreatedAt is the timestamp of when the cloud account was created.
 	CreatedAt string `json:"createdAt"`
 

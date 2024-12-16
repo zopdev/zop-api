@@ -1,8 +1,6 @@
 package service
 
-import (
-	"github.com/zopdev/zop-api/deploymentspace/store"
-)
+import "github.com/zopdev/zop-api/deploymentspace/store"
 
 type DeploymentSpaceResp struct {
 	DeploymentSpace *store.DeploymentSpace `json:"deploymentSpace"`
@@ -21,7 +19,6 @@ type Type struct {
 
 // CloudAccount represents a cloud account with necessary attributes.
 type CloudAccount struct {
-
 	// Name is the name of the cloud account.
 	Name string `json:"name"`
 

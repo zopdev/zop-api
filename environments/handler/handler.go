@@ -44,7 +44,7 @@ func (h *Handler) Add(ctx *gofr.Context) (interface{}, error) {
 	id := ctx.PathParam("id")
 	id = strings.TrimSpace(id)
 
-	applicationID, err := strconv.Atoi(id)
+	applicationID, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (h *Handler) Add(ctx *gofr.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	environment.ApplicationID = int64(applicationID)
+	environment.ApplicationID = applicationID
 
 	err = validateEnvironment(&environment)
 	if err != nil {
