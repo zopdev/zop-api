@@ -49,6 +49,21 @@ func (mr *MockApplicationStoreMockRecorder) GetALLApplications(ctx interface{}) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetALLApplications", reflect.TypeOf((*MockApplicationStore)(nil).GetALLApplications), ctx)
 }
 
+// GetApplicationByID mocks base method.
+func (m *MockApplicationStore) GetApplicationByID(ctx *gofr.Context, id int) (*Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetApplicationByID", ctx, id)
+	ret0, _ := ret[0].(*Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetApplicationByID indicates an expected call of GetApplicationByID.
+func (mr *MockApplicationStoreMockRecorder) GetApplicationByID(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetApplicationByID", reflect.TypeOf((*MockApplicationStore)(nil).GetApplicationByID), ctx, id)
+}
+
 // GetApplicationByName mocks base method.
 func (m *MockApplicationStore) GetApplicationByName(ctx *gofr.Context, name string) (*Application, error) {
 	m.ctrl.T.Helper()
@@ -77,4 +92,19 @@ func (m *MockApplicationStore) InsertApplication(ctx *gofr.Context, application 
 func (mr *MockApplicationStoreMockRecorder) InsertApplication(ctx, application interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertApplication", reflect.TypeOf((*MockApplicationStore)(nil).InsertApplication), ctx, application)
+}
+
+// InsertEnvironment mocks base method.
+func (m *MockApplicationStore) InsertEnvironment(ctx *gofr.Context, environment *Environment) (*Environment, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertEnvironment", ctx, environment)
+	ret0, _ := ret[0].(*Environment)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InsertEnvironment indicates an expected call of InsertEnvironment.
+func (mr *MockApplicationStoreMockRecorder) InsertEnvironment(ctx, environment interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertEnvironment", reflect.TypeOf((*MockApplicationStore)(nil).InsertEnvironment), ctx, environment)
 }

@@ -202,3 +202,83 @@ func TestGetApplicationByName(t *testing.T) {
 		})
 	}
 }
+
+func TestGetApplicationByID(t *testing.T) {
+	mockContainer, mock := container.NewMockContainer(t)
+	ctx := &gofr.Context{
+		Context:   context.Background(),
+		Request:   nil,
+		Container: mockContainer,
+	}
+
+	testCases := []struct {
+		name          string
+		appID         int
+		mockBehavior  func()
+		expectedError bool
+		expectedNil   bool
+		expectedID    int64
+	}{
+		{
+			name:  "success",
+			appID: 1,
+			mockBehavior: func() {
+				mockRow := sqlmock.NewRows([]string{"id", "name", "created_at", "updated_at"}).
+					AddRow(1, "Test Application", time.Now(), time.Now())
+				mock.SQL.ExpectQuery(GETBYIDQUERY).
+					WithArgs(1).
+					WillReturnRows(mockRow)
+			},
+			expectedError: false,
+			expectedNil:   false,
+			expectedID:    1,
+		},
+		{
+			name:  "failure on query execution",
+			appID: 1,
+			mockBehavior: func() {
+				mock.SQL.ExpectQuery(GETBYIDQUERY).
+					WithArgs(1).
+					WillReturnError(sql.ErrConnDone)
+			},
+			expectedError: true,
+			expectedNil:   true,
+			expectedID:    0,
+		},
+		{
+			name:  "no rows found",
+			appID: 1,
+			mockBehavior: func() {
+				mock.SQL.ExpectQuery(GETBYIDQUERY).
+					WithArgs(1).
+					WillReturnRows(sqlmock.NewRows(nil))
+			},
+			expectedError: true,
+			expectedNil:   true,
+			expectedID:    0,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mockBehavior()
+
+			store := New()
+			application, err := store.GetApplicationByID(ctx, tc.appID)
+
+			if tc.expectedError {
+				require.Error(t, err)
+				require.Nil(t, application)
+			} else {
+				require.NoError(t, err)
+
+				if tc.expectedNil {
+					require.Nil(t, application)
+				} else {
+					require.NotNil(t, application)
+					require.Equal(t, tc.expectedID, application.ID)
+				}
+			}
+		})
+	}
+}
