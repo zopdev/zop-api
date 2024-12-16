@@ -10,5 +10,8 @@ func All() map[int64]migration.Migrate {
 
 		20241209162239: createCloudAccountTable(),
 		20241211121223: createAPPlicationTable(),
+		20241211121308: createEnvironmentTable(),
+		20241211121841: createDeploymentSpaceTable(),
+		20241212162207: createClusterTable(),
 	}
 }
