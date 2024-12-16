@@ -21,7 +21,7 @@ import (
 
 var (
 	errTest = errors.New("service error")
-	errJson = errors.New("invalid character 'i' looking for beginning of value")
+	errJSON = errors.New("invalid character 'i' looking for beginning of value")
 )
 
 func TestHandler_Add(t *testing.T) {
@@ -78,7 +78,7 @@ func TestHandler_Add(t *testing.T) {
 			requestBody:    `invalid-json`,
 			mockBehavior:   func() {},
 			expectedStatus: netHTTP.StatusBadRequest,
-			expectedError:  errJson,
+			expectedError:  errJSON,
 		},
 		{
 			name:        "service layer error",
