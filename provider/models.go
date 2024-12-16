@@ -42,33 +42,33 @@ type Cluster struct {
 	// Locations lists the locations available for the cluster.
 	Locations []string `json:"locations"`
 
+	// to set key for sending response.
+	Type string `json:"type"`
+
 	// Region specifies the region where the cluster is located.
 	Region string `json:"region"`
 
 	// NodePools is a list of node pools associated with the cluster.
-	NodePools []NodePool `json:"node_pools"`
-
-	// to set key for sending response.
-	Type string `json:"type"`
+	NodePools []NodePool `json:"nodePools"`
 }
 
 // NodePool represents a node pool within a cluster, detailing machine type, availability zones,
 // node version, current node count, and node name.
 type NodePool struct {
 	// MachineType specifies the machine type for the node pool.
-	MachineType string `json:"machine_type"`
-
-	// AvailabilityZones lists the availability zones where nodes in the pool are located.
-	AvailabilityZones []string `json:"availability_zones"`
+	MachineType string `json:"machineType"`
 
 	// NodeVersion indicates the version of the nodes in the pool.
 	NodeVersion string `json:"nodeVersion,omitempty"`
 
+	// NodeName is the name of the node pool.
+	NodeName string `json:"nodeName"`
+
 	// CurrentNode specifies the number of nodes currently in the node pool.
 	CurrentNode int32 `json:"currentNode"`
 
-	// NodeName is the name of the node pool.
-	NodeName string `json:"nodeName"`
+	// AvailabilityZones lists the availability zones where nodes in the pool are located.
+	AvailabilityZones []string `json:"availabilityZones"`
 }
 
 // CloudAccount represents a cloud account, including details such as its name,

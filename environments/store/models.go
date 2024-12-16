@@ -7,17 +7,11 @@ type Environment struct {
 	// ID is the unique identifier of the environment.
 	ID int64 `json:"id"`
 
-	// Name is the name of the environment (e.g., "development", "staging", "production").
-	Name string `json:"name"`
-
-	// Level represents the environment's hierarchical level or priority, such as an integer scale.
-	Level int `json:"level"`
-
 	// ApplicationID is the unique identifier of the application to which this environment belongs.
 	ApplicationID int64 `json:"applicationId"`
 
-	// DeploymentSpace contains any additional deployment-related configuration or metadata.
-	DeploymentSpace any `json:"deploymentSpace"`
+	// Name is the name of the environment (e.g., "development", "staging", "production").
+	Name string `json:"name"`
 
 	// CreatedAt is the timestamp indicating when the environment was created.
 	CreatedAt string `json:"createdAt"`
@@ -28,4 +22,10 @@ type Environment struct {
 	// DeletedAt is the timestamp indicating when the environment was deleted, if applicable.
 	// This field is optional and may be omitted if the environment is active.
 	DeletedAt string `json:"deletedAt,omitempty"`
+
+	// Level represents the environment's hierarchical level or priority, such as an integer scale.
+	Level int `json:"level"`
+
+	// DeploymentSpace contains any additional deployment-related configuration or metadata.
+	DeploymentSpace any `json:"deploymentSpace"`
 }
