@@ -168,9 +168,9 @@ func (*GCP) createTLSConfiguredClient(caCertificate string) (*http.Client, error
 		return nil, err
 	}
 
-	//nolint:gosec //Create a custom HTTP client with the CA certificate
 	tlsConfig := &tls.Config{
-		RootCAs: caCertPool,
+		RootCAs:    caCertPool,
+		MinVersion: tls.VersionTLS12,
 	}
 	client := &http.Client{
 		Transport: &http.Transport{
