@@ -86,7 +86,7 @@ func (g *GCP) ListAllClusters(ctx *gofr.Context, cloudAccount *provider.CloudAcc
 
 	response := &provider.ClusterResponse{
 		Clusters: gkeClusters,
-		NextPage: provider.NextPage{
+		Next: provider.Next{
 			Name: "Namespace",
 			Path: fmt.Sprintf("/cloud-accounts/%v/deployment-space/namespaces", cloudAccount.ID),
 			Params: map[string]string{
