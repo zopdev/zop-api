@@ -7,10 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"go.uber.org/mock/gomock"
+
 	"gofr.dev/pkg/gofr"
 	"gofr.dev/pkg/gofr/http"
 
 	"github.com/zopdev/zop-api/cloudaccounts/store"
+	"github.com/zopdev/zop-api/provider"
 )
 
 var (
@@ -22,6 +24,7 @@ func TestService_AddCloudAccount(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockStore := store.NewMockCloudAccountStore(ctrl)
+	mockProvider := provider.NewMockProvider(ctrl)
 
 	ctx := &gofr.Context{}
 
@@ -100,7 +103,7 @@ func TestService_AddCloudAccount(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mockBehavior()
 
-			service := New(mockStore)
+			service := New(mockStore, mockProvider)
 			_, err := service.AddCloudAccount(ctx, tc.input)
 
 			if tc.expectedError != nil {
@@ -118,6 +121,7 @@ func TestService_FetchAllCloudAccounts(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockStore := store.NewMockCloudAccountStore(ctrl)
+	mockProvider := provider.NewMockProvider(ctrl)
 
 	ctx := &gofr.Context{}
 
@@ -160,7 +164,7 @@ func TestService_FetchAllCloudAccounts(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.mockBehavior()
 
-			service := New(mockStore)
+			service := New(mockStore, mockProvider)
 			_, err := service.FetchAllCloudAccounts(ctx)
 
 			if tc.expectedError != nil {

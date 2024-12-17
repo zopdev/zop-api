@@ -13,6 +13,14 @@ type ClusterResponse struct {
 	// Clusters is a list of clusters available for the provider.
 	Clusters []Cluster `json:"options"`
 
+	// NextPage contains pagination information for retrieving the next set of resources.
+	Next Next `json:"next"`
+
+	Metadata Metadata `json:"metadata"`
+}
+
+type Metadata struct {
+	Name string `json:"name"`
 	// Next contains pagination information for retrieving the next set of resources.
 	Next Next `json:"next"`
 }
@@ -99,6 +107,8 @@ type CloudAccount struct {
 type NamespaceResponse struct {
 	// Options is a list of available namespaces.
 	Options []Namespace `json:"options"`
+
+	Metadata Metadata `json:"metadata"`
 }
 
 // Namespace represents a namespace within a cloud provider. It contains the name and type of the namespace.

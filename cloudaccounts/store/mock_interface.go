@@ -49,6 +49,21 @@ func (mr *MockCloudAccountStoreMockRecorder) GetALLCloudAccounts(ctx interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetALLCloudAccounts", reflect.TypeOf((*MockCloudAccountStore)(nil).GetALLCloudAccounts), ctx)
 }
 
+// GetCloudAccountByID mocks base method.
+func (m *MockCloudAccountStore) GetCloudAccountByID(ctx *gofr.Context, cloudAccountID int) (*CloudAccount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCloudAccountByID", ctx, cloudAccountID)
+	ret0, _ := ret[0].(*CloudAccount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCloudAccountByID indicates an expected call of GetCloudAccountByID.
+func (mr *MockCloudAccountStoreMockRecorder) GetCloudAccountByID(ctx, cloudAccountID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCloudAccountByID", reflect.TypeOf((*MockCloudAccountStore)(nil).GetCloudAccountByID), ctx, cloudAccountID)
+}
+
 // GetCloudAccountByProvider mocks base method.
 func (m *MockCloudAccountStore) GetCloudAccountByProvider(ctx *gofr.Context, providerType, providerID string) (*CloudAccount, error) {
 	m.ctrl.T.Helper()
@@ -62,6 +77,21 @@ func (m *MockCloudAccountStore) GetCloudAccountByProvider(ctx *gofr.Context, pro
 func (mr *MockCloudAccountStoreMockRecorder) GetCloudAccountByProvider(ctx, providerType, providerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCloudAccountByProvider", reflect.TypeOf((*MockCloudAccountStore)(nil).GetCloudAccountByProvider), ctx, providerType, providerID)
+}
+
+// GetCredentials mocks base method.
+func (m *MockCloudAccountStore) GetCredentials(ctx *gofr.Context, cloudAccountID int64) (interface{}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCredentials", ctx, cloudAccountID)
+	ret0, _ := ret[0].(interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCredentials indicates an expected call of GetCredentials.
+func (mr *MockCloudAccountStoreMockRecorder) GetCredentials(ctx, cloudAccountID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCredentials", reflect.TypeOf((*MockCloudAccountStore)(nil).GetCredentials), ctx, cloudAccountID)
 }
 
 // InsertCloudAccount mocks base method.

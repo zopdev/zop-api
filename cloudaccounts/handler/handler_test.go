@@ -29,7 +29,6 @@ func TestHandler_AddCloudAccount(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockService := service.NewMockCloudAccountService(ctrl)
-
 	handler := New(mockService)
 
 	testCases := []struct {
@@ -82,7 +81,7 @@ func TestHandler_AddCloudAccount(t *testing.T) {
 			tc.mockBehavior()
 
 			// Prepare HTTP request
-			req := httptest.NewRequest(netHTTP.MethodPost, "/add", strings.NewReader(tc.requestBody))
+			req := httptest.NewRequest(netHTTP.MethodPost, "/add/{id}", strings.NewReader(tc.requestBody))
 			req.Header.Set("Content-Type", "application/json")
 
 			ctx := &gofr.Context{Context: context.Background(), Request: http.NewRequest(req)}

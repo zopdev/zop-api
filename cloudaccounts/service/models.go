@@ -13,3 +13,10 @@ type gcpCredentials struct {
 	ClientX509CertURL       string `json:"client_x509_cert_url"`
 	UniverseDomain          string `json:"universe_domain"`
 }
+
+// DeploymentSpaceOptions  contains options to setup deployment space.
+type DeploymentSpaceOptions struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Type string `json:"type"`
+}
