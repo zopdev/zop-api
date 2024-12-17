@@ -19,6 +19,10 @@ import (
 	"gofr.dev/pkg/gofr/http"
 )
 
+var (
+	errDeploymentSpaceAlreadyConfigured = errors.New("deployment space already exists")
+)
+
 // Service implements the DeploymentSpaceService interface.
 // It uses a combination of deployment space and cluster stores to manage deployment space operations.
 type Service struct {
@@ -55,6 +59,17 @@ func New(str store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentEn
 func (s *Service) Add(ctx *gofr.Context, deploymentSpace *DeploymentSpace, environmentID int) (*DeploymentSpace, error) {
 	if deploymentSpace.DeploymentSpace == nil {
 		return nil, http.ErrorInvalidParam{Params: []string{"body"}}
+	}
+
+	tempDeploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+	}
+
+	if tempDeploymentSpace != nil {
+		return nil, errDeploymentSpaceAlreadyConfigured
 	}
 
 	dpSpace := store.DeploymentSpace{

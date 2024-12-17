@@ -11,10 +11,12 @@ import (
 	"github.com/zopdev/zop-api/deploymentspace/cluster/service"
 	"github.com/zopdev/zop-api/deploymentspace/cluster/store"
 	"gofr.dev/pkg/gofr"
-	"gofr.dev/pkg/gofr/http"
 )
 
-var errTest = errors.New("service error")
+var (
+	errNamespaceAlreadyInUSe = errors.New("namespace already in use")
+	errTest                  = errors.New("service error")
+)
 
 func TestService_Add(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -190,7 +192,7 @@ func TestService_DuplicateCheck(t *testing.T) {
 					Return(mockCluster, nil)
 			},
 			input:         mockCluster,
-			expectedError: http.ErrorEntityAlreadyExist{},
+			expectedError: errNamespaceAlreadyInUSe,
 			expectedResp:  nil,
 		},
 	}

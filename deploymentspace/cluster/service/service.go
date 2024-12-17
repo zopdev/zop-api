@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"gofr.dev/pkg/gofr"
-	"gofr.dev/pkg/gofr/http"
-
 	"github.com/zopdev/zop-api/deploymentspace"
 	"github.com/zopdev/zop-api/deploymentspace/cluster/store"
+	"gofr.dev/pkg/gofr"
 )
 
 type Service struct {
@@ -21,6 +19,10 @@ func New(str store.ClusterStore) deploymentspace.DeploymentEntity {
 		store: str,
 	}
 }
+
+var (
+	errNamespaceAlreadyInUSe = errors.New("namespace already in use")
+)
 
 func (s *Service) FetchByDeploymentSpaceID(ctx *gofr.Context, id int) (interface{}, error) {
 	cluster, err := s.store.GetByDeploymentSpaceID(ctx, id)
@@ -73,7 +75,7 @@ func (s *Service) DuplicateCheck(ctx *gofr.Context, data any) (interface{}, erro
 	}
 
 	if resp != nil {
-		return nil, http.ErrorEntityAlreadyExist{}
+		return nil, errNamespaceAlreadyInUSe
 	}
 
 	return nil, nil

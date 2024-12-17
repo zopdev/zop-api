@@ -59,6 +59,9 @@ func TestService_AddDeploymentSpace(t *testing.T) {
 		{
 			name: "success",
 			mockBehavior: func() {
+				mockStore.EXPECT().
+					GetByEnvironmentID(ctx, gomock.Any()).
+					Return(nil, nil)
 				mockClusterService.EXPECT().
 					DuplicateCheck(ctx, gomock.Any()).
 					Return(nil, nil) // No duplicate found
@@ -76,6 +79,9 @@ func TestService_AddDeploymentSpace(t *testing.T) {
 		{
 			name: "duplicate cluster error",
 			mockBehavior: func() {
+				mockStore.EXPECT().
+					GetByEnvironmentID(ctx, gomock.Any()).
+					Return(nil, nil)
 				mockClusterService.EXPECT().
 					DuplicateCheck(ctx, gomock.Any()).
 					Return(nil, http.ErrorEntityAlreadyExist{}) // Duplicate found
@@ -87,6 +93,9 @@ func TestService_AddDeploymentSpace(t *testing.T) {
 		{
 			name: "store layer error",
 			mockBehavior: func() {
+				mockStore.EXPECT().
+					GetByEnvironmentID(ctx, gomock.Any()).
+					Return(nil, nil)
 				mockClusterService.EXPECT().
 					DuplicateCheck(ctx, gomock.Any()).
 					Return(nil, nil) // No duplicate found
@@ -101,6 +110,9 @@ func TestService_AddDeploymentSpace(t *testing.T) {
 		{
 			name: "cluster service error",
 			mockBehavior: func() {
+				mockStore.EXPECT().
+					GetByEnvironmentID(ctx, gomock.Any()).
+					Return(nil, nil)
 				mockClusterService.EXPECT().
 					DuplicateCheck(ctx, gomock.Any()).
 					Return(nil, nil) // No duplicate found
