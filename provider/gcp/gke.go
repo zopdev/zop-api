@@ -14,18 +14,13 @@ import (
 	"io"
 	"net/http"
 
-	"cloud.google.com/go/container/apiv1/containerpb"
-
-	"github.com/zopdev/zop-api/provider"
-
-	"gofr.dev/pkg/gofr"
-
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/option"
-
 	container "cloud.google.com/go/container/apiv1"
-
+	"cloud.google.com/go/container/apiv1/containerpb"
+	"github.com/zopdev/zop-api/provider"
+	"gofr.dev/pkg/gofr"
+	"golang.org/x/oauth2/google"
 	apiContainer "google.golang.org/api/container/v1"
+	"google.golang.org/api/option"
 )
 
 // GCP implements the provider.Provider interface for Google Cloud Platform.
@@ -91,7 +86,7 @@ func (g *GCP) ListAllClusters(ctx *gofr.Context, cloudAccount *provider.CloudAcc
 
 	response := &provider.ClusterResponse{
 		Clusters: gkeClusters,
-		NextPage: provider.NextPage{
+		Next: provider.Next{
 			Name: "Namespace",
 			Path: fmt.Sprintf("/cloud-accounts/%v/deployment-space/namespaces", cloudAccount.ID),
 			Params: map[string]string{
@@ -176,9 +171,9 @@ func (*GCP) createTLSConfiguredClient(caCertificate string) (*http.Client, error
 		return nil, err
 	}
 
-	//nolint:gosec //Create a custom HTTP client with the CA certificate
 	tlsConfig := &tls.Config{
-		RootCAs: caCertPool,
+		RootCAs:    caCertPool,
+		MinVersion: tls.VersionTLS12,
 	}
 	client := &http.Client{
 		Transport: &http.Transport{

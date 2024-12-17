@@ -14,18 +14,20 @@ type ClusterResponse struct {
 	Clusters []Cluster `json:"options"`
 
 	// NextPage contains pagination information for retrieving the next set of resources.
-	NextPage NextPage `json:"nextPage"`
+	NextPage Next `json:"nextPage"`
 
 	Metadata Metadata `json:"metadata"`
 }
 
 type Metadata struct {
 	Name string `json:"name"`
+	// Next contains pagination information for retrieving the next set of resources.
+	Next Next `json:"next"`
 }
 
-// NextPage provides pagination details for fetching additional data.
+// Next provides pagination details for fetching additional data.
 // It contains the name, path, and parameters required to get the next page of results.
-type NextPage struct {
+type Next struct {
 	// Name is the name of the next page.
 	Name string `json:"name"`
 
