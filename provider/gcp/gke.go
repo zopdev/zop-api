@@ -14,18 +14,13 @@ import (
 	"io"
 	"net/http"
 
-	"cloud.google.com/go/container/apiv1/containerpb"
-
-	"github.com/zopdev/zop-api/provider"
-
-	"gofr.dev/pkg/gofr"
-
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/option"
-
 	container "cloud.google.com/go/container/apiv1"
-
+	"cloud.google.com/go/container/apiv1/containerpb"
+	"github.com/zopdev/zop-api/provider"
+	"gofr.dev/pkg/gofr"
+	"golang.org/x/oauth2/google"
 	apiContainer "google.golang.org/api/container/v1"
+	"google.golang.org/api/option"
 )
 
 // GCP implements the provider.Provider interface for Google Cloud Platform.
