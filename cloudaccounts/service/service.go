@@ -143,7 +143,7 @@ func (s *Service) ListNamespaces(ctx *gofr.Context, id int, clusterName, cluster
 func (*Service) FetchDeploymentSpaceOptions(_ *gofr.Context, id int) ([]DeploymentSpaceOptions, error) {
 	options := []DeploymentSpaceOptions{
 		{Name: "gke",
-			PATH: fmt.Sprintf("/cloud-accounts/%v/deployment-space/clusters", id),
+			Path: fmt.Sprintf("/cloud-accounts/%v/deployment-space/clusters", id),
 			Type: "type"},
 	}
 

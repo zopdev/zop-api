@@ -99,6 +99,9 @@ func (g *GCP) ListAllClusters(ctx *gofr.Context, cloudAccount *provider.CloudAcc
 				"name":   "name",
 			},
 		},
+		Metadata: provider.Metadata{
+			Name: "GKE Cluster",
+		},
 	}
 
 	return response, nil
@@ -264,6 +267,9 @@ func (*GCP) fetchNamespaces(ctx *gofr.Context, client *http.Client, credBody []b
 
 	return &provider.NamespaceResponse{
 		Options: namespaces,
+		Metadata: provider.Metadata{
+			Name: "namespace",
+		},
 	}, nil
 }
 

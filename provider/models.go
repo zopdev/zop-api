@@ -15,6 +15,12 @@ type ClusterResponse struct {
 
 	// NextPage contains pagination information for retrieving the next set of resources.
 	NextPage NextPage `json:"nextPage"`
+
+	Metadata Metadata `json:"metadata"`
+}
+
+type Metadata struct {
+	Name string `json:"name"`
 }
 
 // NextPage provides pagination details for fetching additional data.
@@ -99,6 +105,8 @@ type CloudAccount struct {
 type NamespaceResponse struct {
 	// Options is a list of available namespaces.
 	Options []Namespace `json:"options"`
+
+	Metadata Metadata `json:"metadata"`
 }
 
 // Namespace represents a namespace within a cloud provider. It contains the name and type of the namespace.
