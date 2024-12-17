@@ -15,7 +15,7 @@ type gcpCredentials struct {
 }
 
 type DeploymentSpaceOptions struct {
-	Name string `json:"Name"`
-	PATH string `json:"PATH"`
-	Type string `json:"Type"`
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Type string `json:"type"`
 }

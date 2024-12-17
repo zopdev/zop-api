@@ -13,20 +13,26 @@ type ClusterResponse struct {
 	// Clusters is a list of clusters available for the provider.
 	Clusters []Cluster `json:"options"`
 
-	// NextPage contains pagination information for retrieving the next set of resources.
-	NextPage NextPage `json:"nextPage"`
+	// Next contains pagination information for retrieving the next set of resources.
+	Next Next `json:"next"`
+
+	Metadata Metadata `json:"metadata"`
 }
 
-// NextPage provides pagination details for fetching additional data.
-// It contains the name, path, and parameters required to get the next page of results.
-type NextPage struct {
-	// Name is the name of the next page.
+type Metadata struct {
+	Name string `json:"name"`
+}
+
+// Next provides pagination details for fetching additional data.
+// It contains the name, path, and parameters required to get the next set of results.
+type Next struct {
+	// Name is the name of the next .
 	Name string `json:"name"`
 
-	// Path is the URL path to the next page of results.
+	// Path is the URL path to the next set of results.
 	Path string `json:"path"`
 
-	// Params holds the parameters required to fetch the next page.
+	// Params holds the parameters required to fetch the next set.
 	Params map[string]string `json:"params"`
 }
 
@@ -99,6 +105,8 @@ type CloudAccount struct {
 type NamespaceResponse struct {
 	// Options is a list of available namespaces.
 	Options []Namespace `json:"options"`
+
+	Metadata Metadata `json:"metadata"`
 }
 
 // Namespace represents a namespace within a cloud provider. It contains the name and type of the namespace.
