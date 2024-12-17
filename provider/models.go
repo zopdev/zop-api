@@ -14,7 +14,7 @@ type ClusterResponse struct {
 	Clusters []Cluster `json:"options"`
 
 	// NextPage contains pagination information for retrieving the next set of resources.
-	NextPage Next `json:"nextPage"`
+	Next Next `json:"next"`
 
 	Metadata Metadata `json:"metadata"`
 }
