@@ -1,3 +1,5 @@
+// Package service provides the business logic for managing clusters in a deployment space.
+
 package service
 
 import (
@@ -10,10 +12,12 @@ import (
 	"gofr.dev/pkg/gofr"
 )
 
+// Service implements the deploymentspace.DeploymentEntity interface to manage clusters.
 type Service struct {
 	store store.ClusterStore
 }
 
+// New initializes and returns a new Service with the provided ClusterStore.
 func New(str store.ClusterStore) deploymentspace.DeploymentEntity {
 	return &Service{
 		store: str,
@@ -21,9 +25,21 @@ func New(str store.ClusterStore) deploymentspace.DeploymentEntity {
 }
 
 var (
+	// errNamespaceAlreadyInUse indicates that the namespace is already associated with another environment.
 	errNamespaceAlreadyInUSe = errors.New("namespace already in use")
 )
 
+// FetchByDeploymentSpaceID retrieves a cluster by its deployment space ID.
+//
+// Parameters:
+//
+//	ctx - The GoFR context carrying request-specific data.
+//	id - The ID of the deployment space whose cluster is being fetched.
+//
+// Returns:
+//
+//	interface{} - The retrieved cluster details.
+//	error - Any error encountered during the fetch operation.
 func (s *Service) FetchByDeploymentSpaceID(ctx *gofr.Context, id int) (interface{}, error) {
 	cluster, err := s.store.GetByDeploymentSpaceID(ctx, id)
 	if err != nil {
@@ -33,6 +49,17 @@ func (s *Service) FetchByDeploymentSpaceID(ctx *gofr.Context, id int) (interface
 	return cluster, nil
 }
 
+// Add adds a new cluster to the storage.
+//
+// Parameters:
+//
+//	ctx - The GoFR context carrying request-specific data.
+//	data - The cluster details to be added in a serializable format.
+//
+// Returns:
+//
+//	interface{} - The added cluster details.
+//	error - Any error encountered during the add operation.
 func (s *Service) Add(ctx *gofr.Context, data any) (interface{}, error) {
 	bytes, err := json.Marshal(data)
 	if err != nil {
@@ -54,6 +81,17 @@ func (s *Service) Add(ctx *gofr.Context, data any) (interface{}, error) {
 	return resp, nil
 }
 
+// DuplicateCheck checks if a cluster with the same details already exists.
+//
+// Parameters:
+//
+//	ctx - The GoFR context carrying request-specific data.
+//	data - The cluster details to check for duplication in a serializable format.
+//
+// Returns:
+//
+//	interface{} - nil if no duplicate is found, otherwise an error indicating the namespace is already in use.
+//	error - Any other error encountered during the check operation.
 func (s *Service) DuplicateCheck(ctx *gofr.Context, data any) (interface{}, error) {
 	bytes, err := json.Marshal(data)
 	if err != nil {
