@@ -14,7 +14,6 @@ type gcpCredentials struct {
 	UniverseDomain          string `json:"universe_domain"`
 }
 
-// DeploymentSpaceOptions  contains options to setup deployment space.
 type DeploymentSpaceOptions struct {
 	Name string `json:"name"`
 	Path string `json:"path"`

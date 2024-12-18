@@ -1,14 +1,25 @@
 package main
 
 import (
-	"github.com/zopdev/zop-api/cloudaccounts/handler"
-	"github.com/zopdev/zop-api/cloudaccounts/service"
-	"github.com/zopdev/zop-api/cloudaccounts/store"
-	"github.com/zopdev/zop-api/provider/gcp"
-
 	appHandler "github.com/zopdev/zop-api/applications/handler"
 	appService "github.com/zopdev/zop-api/applications/service"
 	appStore "github.com/zopdev/zop-api/applications/store"
+	"github.com/zopdev/zop-api/cloudaccounts/handler"
+	"github.com/zopdev/zop-api/cloudaccounts/service"
+	"github.com/zopdev/zop-api/cloudaccounts/store"
+	clStore "github.com/zopdev/zop-api/deploymentspace/cluster/store"
+	"github.com/zopdev/zop-api/provider/gcp"
+
+	envHandler "github.com/zopdev/zop-api/environments/handler"
+	envService "github.com/zopdev/zop-api/environments/service"
+	envStore "github.com/zopdev/zop-api/environments/store"
+
+	deployHandler "github.com/zopdev/zop-api/deploymentspace/handler"
+	deployService "github.com/zopdev/zop-api/deploymentspace/service"
+	deployStore "github.com/zopdev/zop-api/deploymentspace/store"
+
+	clService "github.com/zopdev/zop-api/deploymentspace/cluster/service"
+
 	"github.com/zopdev/zop-api/migrations"
 	"gofr.dev/pkg/gofr"
 )
@@ -24,8 +35,19 @@ func main() {
 	cloudAccountService := service.New(cloudAccountStore, gkeSvc)
 	cloudAccountHandler := handler.New(cloudAccountService)
 
+	deploymentStore := deployStore.New()
+	clusterStore := clStore.New()
+	clusterService := clService.New(clusterStore)
+	deploymentService := deployService.New(deploymentStore, clusterService)
+
+	deploymentHandler := deployHandler.New(deploymentService)
+
+	environmentStore := envStore.New()
+	environmentService := envService.New(environmentStore, deploymentService)
+	envrionmentHandler := envHandler.New(environmentService)
+
 	applicationStore := appStore.New()
-	applicationService := appService.New(applicationStore)
+	applicationService := appService.New(applicationStore, environmentService)
 	applicationHandler := appHandler.New(applicationService)
 
 	app.POST("/cloud-accounts", cloudAccountHandler.AddCloudAccount)
@@ -36,6 +58,13 @@ func main() {
 
 	app.POST("/applications", applicationHandler.AddApplication)
 	app.GET("/applications", applicationHandler.ListApplications)
+	app.GET("/applications/{id}", applicationHandler.GetApplication)
+
+	app.POST("/applications/{id}/environments", envrionmentHandler.Add)
+	app.PATCH("/environments", envrionmentHandler.Update)
+	app.GET("/applications/{id}/environments", envrionmentHandler.List)
+
+	app.POST("/environments/{id}/deploymentspace", deploymentHandler.Add)
 
 	app.Run()
 }
