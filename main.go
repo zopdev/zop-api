@@ -38,7 +38,7 @@ func main() {
 	deploymentStore := deployStore.New()
 	clusterStore := clStore.New()
 	clusterService := clService.New(clusterStore)
-	deploymentService := deployService.New(deploymentStore, clusterService)
+	deploymentService := deployService.New(deploymentStore, clusterService, cloudAccountService, gkeSvc)
 
 	deploymentHandler := deployHandler.New(deploymentService)
 
@@ -65,6 +65,7 @@ func main() {
 	app.GET("/applications/{id}/environments", envrionmentHandler.List)
 
 	app.POST("/environments/{id}/deploymentspace", deploymentHandler.Add)
+	app.GET("/environments/{id}/deploymentspace/services", deploymentHandler.ListServices)
 
 	app.Run()
 }

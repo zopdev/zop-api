@@ -9,6 +9,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"github.com/zopdev/zop-api/cloudaccounts/service"
+	"github.com/zopdev/zop-api/provider"
 
 	"github.com/zopdev/zop-api/deploymentspace"
 	"github.com/zopdev/zop-api/deploymentspace/store"
@@ -26,8 +28,10 @@ var (
 // Service implements the DeploymentSpaceService interface.
 // It uses a combination of deployment space and cluster stores to manage deployment space operations.
 type Service struct {
-	store          store.DeploymentSpaceStore
-	clusterService deploymentspace.DeploymentEntity
+	store               store.DeploymentSpaceStore
+	clusterService      deploymentspace.DeploymentEntity
+	cloudAccountService service.CloudAccountService
+	deploymentService   provider.Provider
 }
 
 // New initializes a new instance of Service with the provided deployment space store and cluster service.
@@ -40,8 +44,14 @@ type Service struct {
 // Returns:
 //
 //	DeploymentSpaceService - An instance of the DeploymentSpaceService interface.
-func New(str store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentEntity) DeploymentSpaceService {
-	return &Service{store: str, clusterService: clusterSvc}
+func New(str store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentEntity,
+	caService service.CloudAccountService, dpService provider.Provider) DeploymentSpaceService {
+	return &Service{
+		store:               str,
+		clusterService:      clusterSvc,
+		cloudAccountService: caService,
+		deploymentService:   dpService,
+	}
 }
 
 // Add adds a new deployment space along with its associated cluster to the system.
@@ -156,4 +166,54 @@ func (s *Service) Fetch(ctx *gofr.Context, environmentID int) (*DeploymentSpaceR
 		DeploymentSpace: deploymentSpace,
 		Cluster:         &cluster,
 	}, nil
+}
+
+func (s *Service) GetServices(ctx *gofr.Context, environmentID int) (any, error) {
+	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
+
+	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	cluster := store.Cluster{}
+
+	err = json.Unmarshal(bytes, &cluster)
+	if err != nil {
+		return nil, err
+	}
+
+	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
+	if err != nil {
+		return nil, err
+	}
+
+	services, err := s.deploymentService.ListServices(getDeploymentSpaceArgs(ctx, &cluster, credentials))
+	if err != nil {
+		return nil, err
+	}
+
+	return services, nil
+}
+
+func getDeploymentSpaceArgs(ctx *gofr.Context, cluster *store.Cluster, credentials interface{}) (*gofr.Context,
+	*provider.Cluster, *provider.CloudAccount, any, string) {
+	cl := provider.Cluster{
+		Name:   cluster.Name,
+		Region: cluster.Region,
+	}
+
+	cloudAccount := provider.CloudAccount{
+		Provider:   cluster.Provider,
+		ProviderID: cluster.ProviderID,
+	}
+
+	namespace := cluster.Namespace.Name
+
+	return ctx, &cl, &cloudAccount, credentials, namespace
 }

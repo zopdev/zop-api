@@ -29,4 +29,6 @@ type Provider interface {
 	//
 	// Returns the namespaces for the specified cluster, or an error if the request fails.
 	ListNamespace(ctx *gofr.Context, cluster *Cluster, cloudAccount *CloudAccount, credentials interface{}) (interface{}, error)
+	ListServices(ctx *gofr.Context, cluster *Cluster,
+		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
 }

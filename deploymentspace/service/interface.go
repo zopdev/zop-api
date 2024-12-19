@@ -32,4 +32,5 @@ type DeploymentSpaceService interface {
 	//   *DeploymentSpaceResp - The deployment space response object that includes the deployment space and cluster.
 	//   error - Any error encountered during the fetch operation.
 	Fetch(ctx *gofr.Context, environmentID int) (*DeploymentSpaceResp, error)
+	GetServices(ctx *gofr.Context, environmentID int) (any, error)
 }

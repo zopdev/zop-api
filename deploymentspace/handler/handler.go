@@ -81,3 +81,22 @@ func validate(deploymentSpace *service.DeploymentSpace) error {
 
 	return nil
 }
+
+func (h *Handler) ListServices(ctx *gofr.Context) (interface{}, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	environmentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	resp, err := h.service.GetServices(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
