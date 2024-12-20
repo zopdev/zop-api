@@ -39,7 +39,7 @@ func (*Store) GetByEnvironmentID(ctx *gofr.Context, environmentID int) (*Deploym
 
 	err := ctx.SQL.QueryRowContext(ctx, GETQUERYBYENVID, environmentID).Scan(&deploymentSpace.ID,
 		&deploymentSpace.CloudAccountID, &deploymentSpace.EnvironmentID, &deploymentSpace.Type,
-		&deploymentSpace.CreatedAt, &deploymentSpace.UpdatedAt, &deploymentSpace.CloudAccountName)
+		&deploymentSpace.CreatedAt, &deploymentSpace.UpdatedAt, &deploymentSpace.CloudAccountName, &deploymentSpace.EnvironmentName)
 	if err != nil {
 		return nil, err
 	}

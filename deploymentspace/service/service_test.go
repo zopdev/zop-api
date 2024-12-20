@@ -283,7 +283,7 @@ func TestGetDeploymentSpaceArgs(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			ctx, cl, ca, creds, ns := getDeploymentSpaceArgs(tc.ctx, tc.cluster, tc.credentials)
+			ctx, cl, ca, creds, ns := getClusterCloudAccount(tc.ctx, tc.cluster, tc.credentials)
 
 			require.Equal(t, tc.ctx, ctx)
 			require.Equal(t, tc.expectedCl, cl)

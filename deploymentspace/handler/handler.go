@@ -4,11 +4,10 @@
 package handler
 
 import (
-	"strconv"
-	"strings"
-
 	"gofr.dev/pkg/gofr"
 	"gofr.dev/pkg/gofr/http"
+	"strconv"
+	"strings"
 
 	"github.com/zopdev/zop-api/deploymentspace/service"
 )
@@ -113,6 +112,52 @@ func (h *Handler) ListDeployments(ctx *gofr.Context) (any, error) {
 	}
 
 	resp, err := h.service.GetDeployments(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (h *Handler) GetService(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	name := ctx.PathParam("name")
+
+	envID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	if name == "" {
+		return nil, http.ErrorMissingParam{Params: []string{"name"}}
+	}
+
+	resp, err := h.service.GetServiceByName(ctx, envID, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (h *Handler) GetDeploymnet(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	name := ctx.PathParam("name")
+
+	envID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	if name == "" {
+		return nil, http.ErrorMissingParam{Params: []string{"name"}}
+	}
+
+	resp, err := h.service.GetDeploymentByName(ctx, envID, name)
 	if err != nil {
 		return nil, err
 	}

@@ -56,8 +56,8 @@ type Strategy struct {
 }
 
 type RollingUpdate struct {
-	MaxUnavailable int64 `json:"maxUnavailable"`
-	MaxSurge       int64 `json:"maxSurge"`
+	MaxUnavailable any `json:"maxUnavailable"`
+	MaxSurge       any `json:"maxSurge"`
 }
 
 type Template struct {
@@ -111,7 +111,7 @@ type Probe struct {
 
 type HTTPGet struct {
 	Path   string `json:"path"`
-	Port   int64  `json:"port"`
+	Port   any    `json:"port"`
 	Scheme string `json:"scheme"`
 }
 
@@ -150,8 +150,4 @@ type Condition struct {
 	LastTransitionTime string `json:"lastTransitionTime"`
 	Reason             string `json:"reason"`
 	Message            string `json:"message"`
-}
-
-type Welcome9Metadata struct {
-	ResourceVersion string `json:"resourceVersion"`
 }

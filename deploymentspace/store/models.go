@@ -13,6 +13,9 @@ type DeploymentSpace struct {
 	// EnvironmentID is the ID of the environment to which the deployment space belongs.
 	EnvironmentID int64 `json:"environmentId"`
 
+	// EnvironmentName is the name of the environment to which the deployment space belongs.
+	EnvironmentName string `json:"environmentName"`
+
 	// CloudAccountName is the name of the cloud account associated with the deployment space.
 	CloudAccountName string `json:"cloudAccountName"`
 

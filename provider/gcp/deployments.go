@@ -3,11 +3,10 @@ package gcp
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-
 	"gofr.dev/pkg/gofr"
 	"golang.org/x/oauth2/google"
+	"io"
+	"net/http"
 
 	"github.com/zopdev/zop-api/provider"
 )
@@ -38,7 +37,7 @@ func (g *GCP) ListDeployments(ctx *gofr.Context, cluster *provider.Cluster,
 		Items []provider.DeploymentData `json:"items"`
 	}
 
-	err = g.fetchDeployments(ctx, client, credBody, apiEndpoint, depResponse)
+	err = g.fetchDeployments(ctx, client, credBody, apiEndpoint, &depResponse)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch deployments: %w", err)
 	}
@@ -46,7 +45,7 @@ func (g *GCP) ListDeployments(ctx *gofr.Context, cluster *provider.Cluster,
 	return &provider.Deployments{
 		Deployments: depResponse.Items,
 		Metadata: &provider.Metadata{
-			Name: "services",
+			Name: "deployments",
 			Type: "kubernetes-cluster",
 		},
 	}, nil
@@ -101,29 +100,38 @@ func (*GCP) fetchDeployments(ctx *gofr.Context, client *http.Client, credBody []
 		return fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	if err := json.Unmarshal(body, &depREsp); err != nil {
+	if err := json.Unmarshal(body, depREsp); err != nil {
 		return fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
 	return nil
 }
 
-	// Parse JSON response
-	var serviceResponse struct {
-		Items []provider.Service `json:"items"`
+func (g *GCP) GetDeployment(ctx *gofr.Context, cluster *provider.Cluster,
+	cloudAcc *provider.CloudAccount, creds any, namespace, name string) (any, error) {
+	credBody, err := g.getCredGCP(creds)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get credentials: %w", err)
 	}
 
-	if err := json.Unmarshal(body, &serviceResponse); err != nil {
-		return nil, fmt.Errorf("failed to parse JSON response: %w", err)
+	gkeCluster, err := g.getClusterInfo(ctx, cluster, cloudAcc, credBody)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cluster info: %w", err)
 	}
 
-	// Extract service details
+	client, err := g.createTLSConfiguredClient(gkeCluster.MasterAuth.ClusterCaCertificate)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create TLS configured client: %w", err)
+	}
 
-	return &provider.ServiceResponse{
-		Services: serviceResponse.Items,
-		Metadata: provider.Metadata{
-			Name: "services",
-			Type: "kubernetes-cluster",
-		},
-	}, nil
+	apiEndpoint := fmt.Sprintf("https://%s/apis/apps/v1/namespaces/%s/deployments/%s", gkeCluster.Endpoint, namespace, name)
+
+	var depResponse provider.DeploymentData
+
+	err = g.fetchDeployments(ctx, client, credBody, apiEndpoint, depResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return &depResponse, nil
 }

@@ -40,9 +40,9 @@ func main() {
 	clusterService := clService.New(clusterStore)
 	deploymentService := deployService.New(deploymentStore, clusterService, cloudAccountService, gkeSvc)
 
+	environmentStore := envStore.New()
 	deploymentHandler := deployHandler.New(deploymentService)
 
-	environmentStore := envStore.New()
 	environmentService := envService.New(environmentStore, deploymentService)
 	envrionmentHandler := envHandler.New(environmentService)
 
@@ -65,8 +65,10 @@ func main() {
 	app.GET("/applications/{id}/environments", envrionmentHandler.List)
 
 	app.POST("/environments/{id}/deploymentspace", deploymentHandler.Add)
-	app.GET("/environments/{id}/deploymentspace/services", deploymentHandler.ListServices)
-	app.GET("/environments/{id}/deploymentspace/deployments", deploymentHandler.ListDeployments)
+	app.GET("/environments/{id}/deploymentspace/service/{name}", deploymentHandler.GetService)
+	app.GET("/environments/{id}/deploymentspace/service", deploymentHandler.ListServices)
+	app.GET("/environments/{id}/deploymentspace/deployment/{name}", deploymentHandler.GetDeploymnet)
+	app.GET("/environments/{id}/deploymentspace/deployment", deploymentHandler.ListDeployments)
 
 	app.Run()
 }
