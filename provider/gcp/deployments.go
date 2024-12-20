@@ -128,7 +128,7 @@ func (g *GCP) GetDeployment(ctx *gofr.Context, cluster *provider.Cluster,
 
 	var depResponse provider.DeploymentData
 
-	err = g.fetchDeployments(ctx, client, credBody, apiEndpoint, depResponse)
+	err = g.fetchDeployments(ctx, client, credBody, apiEndpoint, &depResponse)
 	if err != nil {
 		return nil, err
 	}

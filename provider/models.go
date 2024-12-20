@@ -139,6 +139,7 @@ type K8sMetadata struct {
 	Namespace         string            `json:"namespace"`
 	CreationTimestamp string            `json:"creationTimestamp"`
 	Labels            map[string]string `json:"labels"`
+	Annotations       map[string]string `json:"annotations"`
 }
 
 type ServiceSpec struct {

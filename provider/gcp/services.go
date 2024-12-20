@@ -128,9 +128,7 @@ func (g *GCP) GetService(ctx *gofr.Context, cluster *provider.Cluster,
 
 	apiEndpoint := fmt.Sprintf("https://%s/api/v1/namespaces/%s/services/%s", gkeCluster.Endpoint, namespace, name)
 
-	var serviceResponse struct {
-		Items provider.Service `json:"items"`
-	}
+	var serviceResponse provider.Service
 
 	err = g.fetchServices(ctx, client, credBody, apiEndpoint, &serviceResponse)
 	if err != nil {
