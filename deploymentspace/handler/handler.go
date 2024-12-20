@@ -100,3 +100,22 @@ func (h *Handler) ListServices(ctx *gofr.Context) (interface{}, error) {
 
 	return resp, nil
 }
+
+func (h *Handler) ListDeployments(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	environmentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	resp, err := h.service.GetDeployments(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}

@@ -33,4 +33,5 @@ type DeploymentSpaceService interface {
 	//   error - Any error encountered during the fetch operation.
 	Fetch(ctx *gofr.Context, environmentID int) (*DeploymentSpaceResp, error)
 	GetServices(ctx *gofr.Context, environmentID int) (any, error)
+	GetDeployments(ctx *gofr.Context, environmentID int) (any, error)
 }

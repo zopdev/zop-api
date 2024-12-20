@@ -66,6 +66,7 @@ func main() {
 
 	app.POST("/environments/{id}/deploymentspace", deploymentHandler.Add)
 	app.GET("/environments/{id}/deploymentspace/services", deploymentHandler.ListServices)
+	app.GET("/environments/{id}/deploymentspace/deployments", deploymentHandler.ListDeployments)
 
 	app.Run()
 }

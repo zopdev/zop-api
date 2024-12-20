@@ -31,4 +31,6 @@ type Provider interface {
 	ListNamespace(ctx *gofr.Context, cluster *Cluster, cloudAccount *CloudAccount, credentials interface{}) (interface{}, error)
 	ListServices(ctx *gofr.Context, cluster *Cluster,
 		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
+	ListDeployments(ctx *gofr.Context, cluster *Cluster,
+		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
 }

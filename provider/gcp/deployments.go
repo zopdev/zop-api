@@ -3,51 +3,62 @@ package gcp
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/zopdev/zop-api/provider"
-	"gofr.dev/pkg/gofr"
-	"golang.org/x/oauth2/google"
 	"io"
 	"net/http"
+
+	"gofr.dev/pkg/gofr"
+	"golang.org/x/oauth2/google"
+
+	"github.com/zopdev/zop-api/provider"
 )
+
+const depType = "kubernetes-cluster"
 
 func (g *GCP) ListDeployments(ctx *gofr.Context, cluster *provider.Cluster,
 	cloudAccount *provider.CloudAccount, credentials interface{}, namespace string) (interface{}, error) {
-	// Step 1: Get GCP credentials
 	credBody, err := g.getCredGCP(credentials)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get credentials: %w", err)
 	}
 
-	// Step 2: Get cluster information
 	gkeCluster, err := g.getClusterInfo(ctx, cluster, cloudAccount, credBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cluster info: %w", err)
 	}
 
-	// Step 3: Create HTTP client with TLS configured
 	client, err := g.createTLSConfiguredClient(gkeCluster.MasterAuth.ClusterCaCertificate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create TLS configured client: %w", err)
 	}
 
-	// Step 4: Fetch services from the Kubernetes API
-	apiEndpoint := fmt.Sprintf("https://%s/api/v1/namespaces/%s/deployments", gkeCluster.Endpoint, namespace)
+	apiEndpoint := fmt.Sprintf("https://%s/apis/apps/v1/namespaces/%s/deployments", gkeCluster.Endpoint, namespace)
 
-	services, err := g.fetchDeployments(ctx, client, credBody, apiEndpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch services: %w", err)
+	// Parse JSON response
+	var depResponse struct {
+		Items []provider.DeploymentData `json:"items"`
 	}
 
-	return services, nil
+	err = g.fetchDeployments(ctx, client, credBody, apiEndpoint, depResponse)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch deployments: %w", err)
+	}
+
+	return &provider.Deployments{
+		Deployments: depResponse.Items,
+		Metadata: &provider.Metadata{
+			Name: "services",
+			Type: "kubernetes-cluster",
+		},
+	}, nil
 }
 
-// fetchDeployments fetches Kubernetes services from the specified namespace using the provided HTTP client.
+// fetchDeployments fetches Kubernetes deployments from the specified namespace using the provided HTTP client.
 func (*GCP) fetchDeployments(ctx *gofr.Context, client *http.Client, credBody []byte,
-	apiEndpoint string) (*provider.ServiceResponse, error) {
+	apiEndpoint string, depREsp any) error {
 	// Generate a JWT token from the credentials
 	config, err := google.JWTConfigFromJSON(credBody, "https://www.googleapis.com/auth/cloud-platform")
 	if err != nil {
-		return nil, fmt.Errorf("failed to create JWT config: %w", err)
+		return fmt.Errorf("failed to create JWT config: %w", err)
 	}
 
 	// Create a TokenSource
@@ -57,14 +68,14 @@ func (*GCP) fetchDeployments(ctx *gofr.Context, client *http.Client, credBody []
 	token, err := tokenSource.Token()
 	if err != nil {
 		ctx.Logger.Errorf("failed to get token: %v", err)
-		return nil, err
+		return err
 	}
 
-	// Make a request to the Kubernetes API to list services
+	// Make a request to the Kubernetes API to list deployments
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiEndpoint, http.NoBody)
 	if err != nil {
 		ctx.Logger.Errorf("failed to create request: %w", err)
-		return nil, err
+		return err
 	}
 
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
@@ -72,7 +83,7 @@ func (*GCP) fetchDeployments(ctx *gofr.Context, client *http.Client, credBody []
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("API call failed: %w", err)
+		return fmt.Errorf("API call failed: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -80,14 +91,22 @@ func (*GCP) fetchDeployments(ctx *gofr.Context, client *http.Client, credBody []
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		ctx.Logger.Errorf("API call failed with status code %d: %s", resp.StatusCode, body)
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return fmt.Errorf("failed to read response body: %w", err)
 	}
+
+	if err := json.Unmarshal(body, &depREsp); err != nil {
+		return fmt.Errorf("failed to parse JSON response: %w", err)
+	}
+
+	return nil
+}
 
 	// Parse JSON response
 	var serviceResponse struct {

@@ -130,7 +130,7 @@ type ServiceList struct {
 
 type Service struct {
 	Metadata K8sMetadata `json:"metadata"`
-	Spec     Spec        `json:"spec"`
+	Spec     ServiceSpec `json:"spec"`
 	Status   Status      `json:"status"`
 }
 
@@ -141,7 +141,7 @@ type K8sMetadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-type Spec struct {
+type ServiceSpec struct {
 	Ports                    []Port            `json:"ports"`
 	Selector                 map[string]string `json:"selector"`
 	ClusterIP                string            `json:"clusterIP"`
