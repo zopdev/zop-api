@@ -170,36 +170,11 @@ func (s *Service) Fetch(ctx *gofr.Context, environmentID int) (*DeploymentSpaceR
 }
 
 func (s *Service) GetServices(ctx *gofr.Context, environmentID int) (any, error) {
-	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
 	if err != nil {
 		return nil, err
 	}
-
-	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := json.Marshal(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	cluster := store.Cluster{}
-
-	err = json.Unmarshal(bytes, &cluster)
-	if err != nil {
-		return nil, err
-	}
-
-	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
-	if err != nil {
-		return nil, err
-	}
-
-	cl, ca := getClusterCloudAccount(&cluster)
-
-	services, err := s.providerService.ListServices(ctx, cl, ca, credentials, cluster.Namespace.Name)
+	services, err := s.providerService.ListServices(ctx, cl, ca, credentials, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -215,36 +190,45 @@ func (s *Service) GetServices(ctx *gofr.Context, environmentID int) (any, error)
 }
 
 func (s *Service) GetDeployments(ctx *gofr.Context, environmentID int) (any, error) {
-	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
+
+	deps, err := s.providerService.ListDeployments(ctx, cl, ca, credentials, namespace)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
+	return response.Response{
+		Data: deps,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetPods(ctx *gofr.Context, environmentID int) (any, error) {
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
+
+	deps, err := s.providerService.ListPods(ctx, cl, ca, credentials, namespace)
 	if err != nil {
 		return nil, err
 	}
 
-	bytes, err := json.Marshal(resp)
-	if err != nil {
-		return nil, err
-	}
+	return response.Response{
+		Data: deps,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
 
-	cluster := store.Cluster{}
+func (s *Service) GetCronJobs(ctx *gofr.Context, environmentID int) (any, error) {
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
 
-	err = json.Unmarshal(bytes, &cluster)
-	if err != nil {
-		return nil, err
-	}
-
-	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
-	if err != nil {
-		return nil, err
-	}
-
-	cl, ca := getClusterCloudAccount(&cluster)
-
-	deps, err := s.providerService.ListDeployments(ctx, cl, ca, credentials, cluster.Namespace.Name)
+	deps, err := s.providerService.ListCronJobs(ctx, cl, ca, credentials, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -260,36 +244,9 @@ func (s *Service) GetDeployments(ctx *gofr.Context, environmentID int) (any, err
 }
 
 func (s *Service) GetServiceByName(ctx *gofr.Context, environmentID int, serviceName string) (any, error) {
-	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
-	if err != nil {
-		return nil, err
-	}
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
 
-	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := json.Marshal(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	cluster := store.Cluster{}
-
-	err = json.Unmarshal(bytes, &cluster)
-	if err != nil {
-		return nil, err
-	}
-
-	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
-	if err != nil {
-		return nil, err
-	}
-
-	cl, ca := getClusterCloudAccount(&cluster)
-
-	svc, err := s.providerService.GetService(ctx, cl, ca, credentials, cluster.Namespace.Name, serviceName)
+	svc, err := s.providerService.GetService(ctx, cl, ca, credentials, namespace, serviceName)
 	if err != nil {
 		return nil, err
 	}
@@ -305,42 +262,51 @@ func (s *Service) GetServiceByName(ctx *gofr.Context, environmentID int, service
 }
 
 func (s *Service) GetDeploymentByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error) {
-	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
-	if err != nil {
-		return nil, err
-	}
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
 
-	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := json.Marshal(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	cluster := store.Cluster{}
-
-	err = json.Unmarshal(bytes, &cluster)
-	if err != nil {
-		return nil, err
-	}
-
-	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
-	if err != nil {
-		return nil, err
-	}
-
-	cl, ca := getClusterCloudAccount(&cluster)
-
-	deployment, err := s.providerService.GetDeployment(ctx, cl, ca, credentials, cluster.Namespace.Name, deploymentName)
+	deployment, err := s.providerService.GetDeployment(ctx, cl, ca, credentials, namespace, deploymentName)
 	if err != nil {
 		return nil, err
 	}
 
 	return response.Response{
 		Data: deployment,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetPodByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error) {
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
+
+	svc, err := s.providerService.GetPod(ctx, cl, ca, credentials, namespace, deploymentName)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: svc,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetCronJobByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error) {
+	deploymentSpace, cl, ca, credentials, namespace, err := s.getClusterDetails(ctx, environmentID)
+
+	svc, err := s.providerService.GetCronJob(ctx, cl, ca, credentials, namespace, deploymentName)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: svc,
 		Metadata: struct {
 			EnvironmentName string `json:"environmentName"`
 		}{
@@ -362,4 +328,39 @@ func getClusterCloudAccount(cluster *store.Cluster) (
 	}
 
 	return &cl, &cloudAccount
+}
+
+func (s *Service) getClusterDetails(ctx *gofr.Context, environmentID int) (*store.DeploymentSpace,
+	*provider.Cluster, *provider.CloudAccount, interface{}, string, error) {
+	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
+	if err != nil {
+		return nil, nil, nil, nil, "", err
+	}
+
+	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
+	if err != nil {
+		return nil, nil, nil, nil, "", err
+	}
+
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		return nil, nil, nil, nil, "", err
+	}
+
+	cluster := store.Cluster{}
+
+	err = json.Unmarshal(bytes, &cluster)
+	if err != nil {
+		return nil, nil, nil, nil, "", err
+	}
+
+	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
+	if err != nil {
+		return nil, nil, nil, nil, "", err
+	}
+
+	cl, ca := getClusterCloudAccount(&cluster)
+
+	return deploymentSpace, cl, ca, credentials, cluster.Namespace.Name, nil
+
 }

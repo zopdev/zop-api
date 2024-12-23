@@ -119,6 +119,44 @@ func (h *Handler) ListDeployments(ctx *gofr.Context) (any, error) {
 	return resp, nil
 }
 
+func (h *Handler) ListPods(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	environmentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	resp, err := h.service.GetPods(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (h *Handler) ListCronJobs(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	id = strings.TrimSpace(id)
+
+	environmentID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	resp, err := h.service.GetCronJobs(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (h *Handler) GetService(ctx *gofr.Context) (any, error) {
 	id := ctx.PathParam("id")
 	name := ctx.PathParam("name")
@@ -142,7 +180,7 @@ func (h *Handler) GetService(ctx *gofr.Context) (any, error) {
 	return resp, nil
 }
 
-func (h *Handler) GetDeploymnet(ctx *gofr.Context) (any, error) {
+func (h *Handler) GetDeployment(ctx *gofr.Context) (any, error) {
 	id := ctx.PathParam("id")
 	name := ctx.PathParam("name")
 
@@ -158,6 +196,52 @@ func (h *Handler) GetDeploymnet(ctx *gofr.Context) (any, error) {
 	}
 
 	resp, err := h.service.GetDeploymentByName(ctx, envID, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (h *Handler) GetPod(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	name := ctx.PathParam("name")
+
+	envID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	if name == "" {
+		return nil, http.ErrorMissingParam{Params: []string{"name"}}
+	}
+
+	resp, err := h.service.GetPodByName(ctx, envID, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+func (h *Handler) GetCronJob(ctx *gofr.Context) (any, error) {
+	id := ctx.PathParam("id")
+	name := ctx.PathParam("name")
+
+	envID, err := strconv.Atoi(id)
+	if err != nil {
+		ctx.Logger.Error(err, "failed to convert environment id to int")
+
+		return nil, http.ErrorInvalidParam{Params: []string{"id"}}
+	}
+
+	if name == "" {
+		return nil, http.ErrorMissingParam{Params: []string{"name"}}
+	}
+
+	resp, err := h.service.GetCronJobByName(ctx, envID, name)
 	if err != nil {
 		return nil, err
 	}

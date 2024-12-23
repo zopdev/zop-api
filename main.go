@@ -67,8 +67,12 @@ func main() {
 	app.POST("/environments/{id}/deploymentspace", deploymentHandler.Add)
 	app.GET("/environments/{id}/deploymentspace/service/{name}", deploymentHandler.GetService)
 	app.GET("/environments/{id}/deploymentspace/service", deploymentHandler.ListServices)
-	app.GET("/environments/{id}/deploymentspace/deployment/{name}", deploymentHandler.GetDeploymnet)
+	app.GET("/environments/{id}/deploymentspace/deployment/{name}", deploymentHandler.GetDeployment)
 	app.GET("/environments/{id}/deploymentspace/deployment", deploymentHandler.ListDeployments)
+	app.GET("/environments/{id}/deploymentspace/pod/{name}", deploymentHandler.GetPod)
+	app.GET("/environments/{id}/deploymentspace/pod", deploymentHandler.ListPods)
+	app.GET("/environments/{id}/deploymentspace/cronjob/{name}", deploymentHandler.GetCronJob)
+	app.GET("/environments/{id}/deploymentspace/cronjob", deploymentHandler.ListCronJobs)
 
 	app.Run()
 }

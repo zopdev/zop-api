@@ -34,6 +34,10 @@ type DeploymentSpaceService interface {
 	Fetch(ctx *gofr.Context, environmentID int) (*DeploymentSpaceResp, error)
 	GetServices(ctx *gofr.Context, environmentID int) (any, error)
 	GetDeployments(ctx *gofr.Context, environmentID int) (any, error)
+	GetPods(ctx *gofr.Context, environmentID int) (any, error)
+	GetCronJobs(ctx *gofr.Context, environmentID int) (any, error)
 	GetServiceByName(ctx *gofr.Context, envID int, serviceName string) (any, error)
 	GetDeploymentByName(ctx *gofr.Context, envID int, deploymentName string) (any, error)
+	GetPodByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error)
+	GetCronJobByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error)
 }

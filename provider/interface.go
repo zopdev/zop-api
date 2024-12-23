@@ -33,9 +33,17 @@ type Provider interface {
 		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
 	ListDeployments(ctx *gofr.Context, cluster *Cluster,
 		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
+	ListPods(ctx *gofr.Context, cluster *Cluster,
+		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
+	ListCronJobs(ctx *gofr.Context, cluster *Cluster,
+		cloudAccount *CloudAccount, credentials interface{}, namespace string) (interface{}, error)
 
 	GetService(ctx *gofr.Context, cluster *Cluster,
 		cloudAccount *CloudAccount, credentials interface{}, namespace, name string) (interface{}, error)
 	GetDeployment(ctx *gofr.Context, cluster *Cluster,
 		cloudAccount *CloudAccount, credentials interface{}, namespace, name string) (interface{}, error)
+	GetPod(ctx *gofr.Context, cluster *Cluster,
+		cloudAccount *CloudAccount, credentials interface{}, namespace, name string) (interface{}, error)
+	GetCronJob(ctx *gofr.Context, cluster *Cluster,
+		cloudAcc *CloudAccount, creds any, namespace, name string) (any, error)
 }
