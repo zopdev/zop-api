@@ -12,4 +12,5 @@ type CloudAccountService interface {
 	FetchDeploymentSpace(ctx *gofr.Context, cloudAccountID int) (interface{}, error)
 	ListNamespaces(ctx *gofr.Context, id int, clusterName, clusterRegion string) (interface{}, error)
 	FetchDeploymentSpaceOptions(ctx *gofr.Context, id int) ([]DeploymentSpaceOptions, error)
+	FetchCredentials(ctx *gofr.Context, cloudAccountID int64) (interface{}, error)
 }

@@ -1,6 +1,9 @@
 package service
 
-import "github.com/zopdev/zop-api/deploymentspace/store"
+import (
+	"github.com/zopdev/zop-api/deploymentspace/store"
+	"github.com/zopdev/zop-api/provider"
+)
 
 // DeploymentSpaceResp represents the response structure for a deployment space.
 // It contains the details of the deployment space and the associated cluster.
@@ -60,4 +63,12 @@ type CloudAccount struct {
 
 	// Credentials hold authentication information for access to the provider.
 	Credentials interface{} `json:"credentials,omitempty"`
+}
+
+type clusterConfigs struct {
+	deploymentSpace *store.DeploymentSpace
+	cluster         *provider.Cluster
+	cloudAccount    *provider.CloudAccount
+	credentials     interface{}
+	Namespace       string
 }

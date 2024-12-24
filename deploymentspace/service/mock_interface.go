@@ -8,7 +8,6 @@ import (
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
-
 	gofr "gofr.dev/pkg/gofr"
 )
 
@@ -63,4 +62,124 @@ func (m *MockDeploymentSpaceService) Fetch(ctx *gofr.Context, environmentID int)
 func (mr *MockDeploymentSpaceServiceMockRecorder) Fetch(ctx, environmentID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockDeploymentSpaceService)(nil).Fetch), ctx, environmentID)
+}
+
+// GetCronJobByName mocks base method.
+func (m *MockDeploymentSpaceService) GetCronJobByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCronJobByName", ctx, environmentID, deploymentName)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCronJobByName indicates an expected call of GetCronJobByName.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetCronJobByName(ctx, environmentID, deploymentName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCronJobByName", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetCronJobByName), ctx, environmentID, deploymentName)
+}
+
+// GetCronJobs mocks base method.
+func (m *MockDeploymentSpaceService) GetCronJobs(ctx *gofr.Context, environmentID int) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCronJobs", ctx, environmentID)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCronJobs indicates an expected call of GetCronJobs.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetCronJobs(ctx, environmentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCronJobs", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetCronJobs), ctx, environmentID)
+}
+
+// GetDeploymentByName mocks base method.
+func (m *MockDeploymentSpaceService) GetDeploymentByName(ctx *gofr.Context, envID int, deploymentName string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDeploymentByName", ctx, envID, deploymentName)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDeploymentByName indicates an expected call of GetDeploymentByName.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetDeploymentByName(ctx, envID, deploymentName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDeploymentByName", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetDeploymentByName), ctx, envID, deploymentName)
+}
+
+// GetDeployments mocks base method.
+func (m *MockDeploymentSpaceService) GetDeployments(ctx *gofr.Context, environmentID int) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDeployments", ctx, environmentID)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDeployments indicates an expected call of GetDeployments.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetDeployments(ctx, environmentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDeployments", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetDeployments), ctx, environmentID)
+}
+
+// GetPodByName mocks base method.
+func (m *MockDeploymentSpaceService) GetPodByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPodByName", ctx, environmentID, deploymentName)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPodByName indicates an expected call of GetPodByName.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetPodByName(ctx, environmentID, deploymentName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPodByName", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetPodByName), ctx, environmentID, deploymentName)
+}
+
+// GetPods mocks base method.
+func (m *MockDeploymentSpaceService) GetPods(ctx *gofr.Context, environmentID int) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPods", ctx, environmentID)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPods indicates an expected call of GetPods.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetPods(ctx, environmentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPods", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetPods), ctx, environmentID)
+}
+
+// GetServiceByName mocks base method.
+func (m *MockDeploymentSpaceService) GetServiceByName(ctx *gofr.Context, envID int, serviceName string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServiceByName", ctx, envID, serviceName)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServiceByName indicates an expected call of GetServiceByName.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetServiceByName(ctx, envID, serviceName interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServiceByName", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetServiceByName), ctx, envID, serviceName)
+}
+
+// GetServices mocks base method.
+func (m *MockDeploymentSpaceService) GetServices(ctx *gofr.Context, environmentID int) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServices", ctx, environmentID)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServices indicates an expected call of GetServices.
+func (mr *MockDeploymentSpaceServiceMockRecorder) GetServices(ctx, environmentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServices", reflect.TypeOf((*MockDeploymentSpaceService)(nil).GetServices), ctx, environmentID)
 }

@@ -10,8 +10,12 @@ import (
 	"encoding/json"
 	"errors"
 
+	"gofr.dev/pkg/gofr/http/response"
+
+	"github.com/zopdev/zop-api/cloudaccounts/service"
 	"github.com/zopdev/zop-api/deploymentspace"
 	"github.com/zopdev/zop-api/deploymentspace/store"
+	"github.com/zopdev/zop-api/provider"
 
 	clusterStore "github.com/zopdev/zop-api/deploymentspace/cluster/store"
 
@@ -26,8 +30,10 @@ var (
 // Service implements the DeploymentSpaceService interface.
 // It uses a combination of deployment space and cluster stores to manage deployment space operations.
 type Service struct {
-	store          store.DeploymentSpaceStore
-	clusterService deploymentspace.DeploymentEntity
+	store               store.DeploymentSpaceStore
+	clusterService      deploymentspace.DeploymentEntity
+	cloudAccountService service.CloudAccountService
+	providerService     provider.Provider
 }
 
 // New initializes a new instance of Service with the provided deployment space store and cluster service.
@@ -40,8 +46,14 @@ type Service struct {
 // Returns:
 //
 //	DeploymentSpaceService - An instance of the DeploymentSpaceService interface.
-func New(str store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentEntity) DeploymentSpaceService {
-	return &Service{store: str, clusterService: clusterSvc}
+func New(str store.DeploymentSpaceStore, clusterSvc deploymentspace.DeploymentEntity,
+	caService service.CloudAccountService, providerSvc provider.Provider) DeploymentSpaceService {
+	return &Service{
+		store:               str,
+		clusterService:      clusterSvc,
+		cloudAccountService: caService,
+		providerService:     providerSvc,
+	}
 }
 
 // Add adds a new deployment space along with its associated cluster to the system.
@@ -155,5 +167,235 @@ func (s *Service) Fetch(ctx *gofr.Context, environmentID int) (*DeploymentSpaceR
 	return &DeploymentSpaceResp{
 		DeploymentSpace: deploymentSpace,
 		Cluster:         &cluster,
+	}, nil
+}
+
+func (s *Service) GetServices(ctx *gofr.Context, environmentID int) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	services, err := s.providerService.ListServices(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: services,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetDeployments(ctx *gofr.Context, environmentID int) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	deps, err := s.providerService.ListDeployments(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: deps,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetPods(ctx *gofr.Context, environmentID int) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	pods, err := s.providerService.ListPods(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: pods,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetCronJobs(ctx *gofr.Context, environmentID int) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	cronJobs, err := s.providerService.ListCronJobs(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: cronJobs,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetServiceByName(ctx *gofr.Context, environmentID int, serviceName string) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	svc, err := s.providerService.GetService(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace, serviceName)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: svc,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetDeploymentByName(ctx *gofr.Context, environmentID int, deploymentName string) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	deployment, err := s.providerService.GetDeployment(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace, deploymentName)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: deployment,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetPodByName(ctx *gofr.Context, environmentID int, podName string) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	pod, err := s.providerService.GetPod(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace, podName)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: pod,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func (s *Service) GetCronJobByName(ctx *gofr.Context, environmentID int, cronJobName string) (any, error) {
+	clusterDetails, err := s.getClusterDetails(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	cronJob, err := s.providerService.GetCronJob(ctx, clusterDetails.cluster, clusterDetails.cloudAccount,
+		clusterDetails.credentials, clusterDetails.Namespace, cronJobName)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Response{
+		Data: cronJob,
+		Metadata: struct {
+			EnvironmentName string `json:"environmentName"`
+		}{
+			EnvironmentName: clusterDetails.deploymentSpace.EnvironmentName,
+		},
+	}, nil
+}
+
+func getClusterCloudAccount(cluster *store.Cluster) (
+	*provider.Cluster, *provider.CloudAccount) {
+	cl := provider.Cluster{
+		Name:   cluster.Name,
+		Region: cluster.Region,
+	}
+
+	cloudAccount := provider.CloudAccount{
+		Provider:   cluster.Provider,
+		ProviderID: cluster.ProviderID,
+	}
+
+	return &cl, &cloudAccount
+}
+
+func (s *Service) getClusterDetails(ctx *gofr.Context, environmentID int) (*clusterConfigs, error) {
+	deploymentSpace, err := s.store.GetByEnvironmentID(ctx, environmentID)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.clusterService.FetchByDeploymentSpaceID(ctx, int(deploymentSpace.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	cluster := store.Cluster{}
+
+	err = json.Unmarshal(bytes, &cluster)
+	if err != nil {
+		return nil, err
+	}
+
+	credentials, err := s.cloudAccountService.FetchCredentials(ctx, deploymentSpace.CloudAccountID)
+	if err != nil {
+		return nil, err
+	}
+
+	cl, ca := getClusterCloudAccount(&cluster)
+
+	return &clusterConfigs{
+		deploymentSpace: deploymentSpace,
+		cluster:         cl,
+		cloudAccount:    ca,
+		credentials:     credentials,
+		Namespace:       cluster.Namespace.Name,
 	}, nil
 }

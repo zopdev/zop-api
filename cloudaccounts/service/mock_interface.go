@@ -8,7 +8,6 @@ import (
 	reflect "reflect"
 
 	store "github.com/zopdev/zop-api/cloudaccounts/store"
-
 	gomock "go.uber.org/mock/gomock"
 	gofr "gofr.dev/pkg/gofr"
 )
@@ -17,6 +16,7 @@ import (
 type MockCloudAccountService struct {
 	ctrl     *gomock.Controller
 	recorder *MockCloudAccountServiceMockRecorder
+	isgomock struct{}
 }
 
 // MockCloudAccountServiceMockRecorder is the mock recorder for MockCloudAccountService.
@@ -46,7 +46,7 @@ func (m *MockCloudAccountService) AddCloudAccount(ctx *gofr.Context, accounts *s
 }
 
 // AddCloudAccount indicates an expected call of AddCloudAccount.
-func (mr *MockCloudAccountServiceMockRecorder) AddCloudAccount(ctx, accounts interface{}) *gomock.Call {
+func (mr *MockCloudAccountServiceMockRecorder) AddCloudAccount(ctx, accounts any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCloudAccount", reflect.TypeOf((*MockCloudAccountService)(nil).AddCloudAccount), ctx, accounts)
 }
@@ -61,24 +61,39 @@ func (m *MockCloudAccountService) FetchAllCloudAccounts(ctx *gofr.Context) ([]st
 }
 
 // FetchAllCloudAccounts indicates an expected call of FetchAllCloudAccounts.
-func (mr *MockCloudAccountServiceMockRecorder) FetchAllCloudAccounts(ctx interface{}) *gomock.Call {
+func (mr *MockCloudAccountServiceMockRecorder) FetchAllCloudAccounts(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchAllCloudAccounts", reflect.TypeOf((*MockCloudAccountService)(nil).FetchAllCloudAccounts), ctx)
 }
 
-// FetchDeploymentSpace mocks base method.
-func (m *MockCloudAccountService) FetchDeploymentSpace(ctx *gofr.Context, cloudAccountID int) (interface{}, error) {
+// FetchCredentials mocks base method.
+func (m *MockCloudAccountService) FetchCredentials(ctx *gofr.Context, cloudAccountID int64) (any, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Fetch", ctx, cloudAccountID)
-	ret0, _ := ret[0].(interface{})
+	ret := m.ctrl.Call(m, "FetchCredentials", ctx, cloudAccountID)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchCredentials indicates an expected call of FetchCredentials.
+func (mr *MockCloudAccountServiceMockRecorder) FetchCredentials(ctx, cloudAccountID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchCredentials", reflect.TypeOf((*MockCloudAccountService)(nil).FetchCredentials), ctx, cloudAccountID)
+}
+
+// FetchDeploymentSpace mocks base method.
+func (m *MockCloudAccountService) FetchDeploymentSpace(ctx *gofr.Context, cloudAccountID int) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchDeploymentSpace", ctx, cloudAccountID)
+	ret0, _ := ret[0].(any)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchDeploymentSpace indicates an expected call of FetchDeploymentSpace.
-func (mr *MockCloudAccountServiceMockRecorder) FetchDeploymentSpace(ctx, cloudAccountID interface{}) *gomock.Call {
+func (mr *MockCloudAccountServiceMockRecorder) FetchDeploymentSpace(ctx, cloudAccountID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockCloudAccountService)(nil).FetchDeploymentSpace), ctx, cloudAccountID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchDeploymentSpace", reflect.TypeOf((*MockCloudAccountService)(nil).FetchDeploymentSpace), ctx, cloudAccountID)
 }
 
 // FetchDeploymentSpaceOptions mocks base method.
@@ -91,22 +106,22 @@ func (m *MockCloudAccountService) FetchDeploymentSpaceOptions(ctx *gofr.Context,
 }
 
 // FetchDeploymentSpaceOptions indicates an expected call of FetchDeploymentSpaceOptions.
-func (mr *MockCloudAccountServiceMockRecorder) FetchDeploymentSpaceOptions(ctx, id interface{}) *gomock.Call {
+func (mr *MockCloudAccountServiceMockRecorder) FetchDeploymentSpaceOptions(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchDeploymentSpaceOptions", reflect.TypeOf((*MockCloudAccountService)(nil).FetchDeploymentSpaceOptions), ctx, id)
 }
 
 // ListNamespaces mocks base method.
-func (m *MockCloudAccountService) ListNamespaces(ctx *gofr.Context, id int, clusterName, clusterRegion string) (interface{}, error) {
+func (m *MockCloudAccountService) ListNamespaces(ctx *gofr.Context, id int, clusterName, clusterRegion string) (any, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListNamespaces", ctx, id, clusterName, clusterRegion)
-	ret0, _ := ret[0].(interface{})
+	ret0, _ := ret[0].(any)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListNamespaces indicates an expected call of ListNamespaces.
-func (mr *MockCloudAccountServiceMockRecorder) ListNamespaces(ctx, id, clusterName, clusterRegion interface{}) *gomock.Call {
+func (mr *MockCloudAccountServiceMockRecorder) ListNamespaces(ctx, id, clusterName, clusterRegion any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListNamespaces", reflect.TypeOf((*MockCloudAccountService)(nil).ListNamespaces), ctx, id, clusterName, clusterRegion)
 }

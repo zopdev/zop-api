@@ -21,6 +21,7 @@ type ClusterResponse struct {
 
 type Metadata struct {
 	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 // Next provides pagination details for fetching additional data.
@@ -116,4 +117,58 @@ type Namespace struct {
 
 	// to set key for sending response.
 	Type string `json:"type"`
+}
+
+type ServiceResponse struct {
+	Services []Service `json:"services"`
+	Metadata Metadata  `json:"metadata"`
+}
+
+type ServiceList struct {
+	Items []Service `json:"items"`
+}
+
+type Service struct {
+	Metadata K8sMetadata `json:"metadata"`
+	Spec     ServiceSpec `json:"spec"`
+	Status   Status      `json:"status"`
+}
+
+type K8sMetadata struct {
+	Name              string            `json:"name"`
+	Namespace         string            `json:"namespace"`
+	CreationTimestamp string            `json:"creationTimestamp"`
+	Labels            map[string]string `json:"labels"`
+	Annotations       map[string]string `json:"annotations"`
+}
+
+type ServiceSpec struct {
+	Ports                    []Port            `json:"ports"`
+	Selector                 map[string]string `json:"selector"`
+	ClusterIP                string            `json:"clusterIP"`
+	Type                     string            `json:"type"`
+	SessionAffinity          string            `json:"sessionAffinity"`
+	ExternalIPs              []string          `json:"externalIPs"`
+	LoadBalancerIP           string            `json:"loadBalancerIP"`
+	LoadBalancerSourceRanges []string          `json:"loadBalancerSourceRanges"`
+}
+
+type Port struct {
+	Protocol   string `json:"protocol"`
+	Port       int    `json:"port"`
+	TargetPort any    `json:"targetPort"`
+	NodePort   any    `json:"nodePort"`
+}
+
+type Status struct {
+	LoadBalancer LoadBalancer `json:"loadBalancer"`
+}
+
+type LoadBalancer struct {
+	Ingress []Ingress `json:"ingress"`
+}
+
+type Ingress struct {
+	IP       string `json:"ip"`
+	Hostname string `json:"hostname"`
 }

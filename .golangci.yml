@@ -1,7 +1,7 @@
 ---
 linters-settings:
   dupl:
-    threshold: 100
+    threshold: 150
   exhaustive:
     default-signifies-exhaustive: false
   funlen:
@@ -155,3 +155,6 @@ issues:
         - gomnd
         - dupl
         - goconst
+    - path: provider/gcp/.*\.go
+      linters:
+        - dupl

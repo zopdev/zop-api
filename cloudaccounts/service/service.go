@@ -150,3 +150,12 @@ func (*Service) FetchDeploymentSpaceOptions(_ *gofr.Context, id int) ([]Deployme
 
 	return options, nil
 }
+
+func (s *Service) FetchCredentials(ctx *gofr.Context, cloudAccountID int64) (interface{}, error) {
+	credentials, err := s.store.GetCredentials(ctx, cloudAccountID)
+	if err != nil {
+		return nil, err
+	}
+
+	return credentials, nil
+}

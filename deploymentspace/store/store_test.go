@@ -87,6 +87,7 @@ func TestGetDeploymentSpaceByEnvID(t *testing.T) {
 		CloudAccountName: "Test Cloud Account",
 		CreatedAt:        "2023-12-11T00:00:00Z",
 		UpdatedAt:        "2023-12-11T00:00:00Z",
+		EnvironmentName:  "hello",
 	}
 
 	testCases := []struct {
@@ -102,8 +103,8 @@ func TestGetDeploymentSpaceByEnvID(t *testing.T) {
 			expectedError: false,
 			mockBehavior: func() {
 				mockRow := sqlmock.NewRows([]string{"id", "cloud_account_id", "environment_id", "type", "created_at", "updated_at",
-					"cloud_account_name"}).
-					AddRow(1, 1, 1, "test-type", "2023-12-11T00:00:00Z", "2023-12-11T00:00:00Z", "Test Cloud Account")
+					"cloud_account_name", "ev_name"}).
+					AddRow(1, 1, 1, "test-type", "2023-12-11T00:00:00Z", "2023-12-11T00:00:00Z", "Test Cloud Account", "hello")
 				mock.SQL.ExpectQuery(GETQUERYBYENVID).
 					WithArgs(1).
 					WillReturnRows(mockRow)
