@@ -14,7 +14,7 @@ type CronJobData struct {
 type CronJobMetadata struct {
 	Name              string            `json:"name"`
 	Namespace         string            `json:"namespace"`
-	Uid               string            `json:"uid"`
+	UID               string            `json:"uid"`
 	ResourceVersion   string            `json:"resourceVersion"`
 	CreationTimestamp string            `json:"creationTimestamp"`
 	Labels            map[string]string `json:"labels"`
@@ -41,8 +41,8 @@ type JobSpec struct {
 }
 
 type PodTemplateSpec struct {
-	Metadata map[string]string `json:"metadata"`
-	Spec     PodSpec           `json:"spec"`
+	Metadata map[string]any `json:"metadata"`
+	Spec     PodSpec        `json:"spec"`
 }
 
 type CronJobStatus struct {

@@ -14,7 +14,7 @@ type DeploymentData struct {
 type ItemMetadata struct {
 	Name              string            `json:"name"`
 	Namespace         string            `json:"namespace"`
-	Uid               string            `json:"uid"`
+	UID               string            `json:"uid"`
 	ResourceVersion   string            `json:"resourceVersion"`
 	Generation        int64             `json:"generation"`
 	CreationTimestamp string            `json:"creationTimestamp"`
@@ -93,6 +93,10 @@ type Container struct {
 	TerminationMessagePath   string     `json:"terminationMessagePath"`
 	TerminationMessagePolicy string     `json:"terminationMessagePolicy"`
 	ImagePullPolicy          string     `json:"imagePullPolicy"`
+	Status                   string     `json:"status"`
+	Command                  any        `json:"command"`
+	Args                     any        `json:"args"`
+	VolumeMounts             any        `json:"volumeMounts"`
 }
 
 type Env struct {

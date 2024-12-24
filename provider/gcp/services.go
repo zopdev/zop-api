@@ -3,11 +3,13 @@ package gcp
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/zopdev/zop-api/provider"
-	"gofr.dev/pkg/gofr"
-	"golang.org/x/oauth2/google"
 	"io"
 	"net/http"
+
+	"github.com/zopdev/zop-api/provider"
+	"gofr.dev/pkg/gofr"
+
+	"golang.org/x/oauth2/google"
 )
 
 func (g *GCP) ListServices(ctx *gofr.Context, cluster *provider.Cluster,
@@ -91,13 +93,14 @@ func (*GCP) fetchServices(ctx *gofr.Context, client *http.Client, credBody []byt
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		ctx.Logger.Errorf("API call failed with status code %d: %s", resp.StatusCode, body)
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+
+		return errUnexpectedStatusCode{statusCode: resp.StatusCode}
 	}
 
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("failed to read response body: %w", err)
+		return errUnexpectedStatusCode{statusCode: resp.StatusCode}
 	}
 
 	if err := json.Unmarshal(body, i); err != nil {

@@ -14,11 +14,15 @@ type PodData struct {
 type PodMetadata struct {
 	Name              string            `json:"name"`
 	Namespace         string            `json:"namespace"`
-	Uid               string            `json:"uid"`
+	UID               string            `json:"uid"`
 	ResourceVersion   string            `json:"resourceVersion"`
 	CreationTimestamp string            `json:"creationTimestamp"`
 	Labels            map[string]string `json:"labels"`
 	Annotations       map[string]string `json:"annotations"`
+	OwnerReferences   []struct {
+		Name string `json:"name"`
+		Kind string `json:"kind"`
+	} `json:"ownerReferences"`
 }
 
 type PodSpec struct {

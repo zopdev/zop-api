@@ -4,10 +4,11 @@
 package handler
 
 import (
-	"gofr.dev/pkg/gofr"
-	"gofr.dev/pkg/gofr/http"
 	"strconv"
 	"strings"
+
+	"gofr.dev/pkg/gofr"
+	"gofr.dev/pkg/gofr/http"
 
 	"github.com/zopdev/zop-api/deploymentspace/service"
 )

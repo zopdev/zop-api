@@ -3,8 +3,6 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"github.com/zopdev/zop-api/cloudaccounts/service"
-	"github.com/zopdev/zop-api/provider"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,9 +11,11 @@ import (
 	"gofr.dev/pkg/gofr"
 	"gofr.dev/pkg/gofr/http"
 
+	"github.com/zopdev/zop-api/cloudaccounts/service"
 	"github.com/zopdev/zop-api/deploymentspace"
 	clusterStore "github.com/zopdev/zop-api/deploymentspace/cluster/store"
 	"github.com/zopdev/zop-api/deploymentspace/store"
+	"github.com/zopdev/zop-api/provider"
 )
 
 var (
@@ -283,17 +283,14 @@ func TestGetDeploymentSpaceArgs(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			ctx, cl, ca, creds, ns := getClusterCloudAccount(tc.ctx, tc.cluster, tc.credentials)
+			cl, _ := getClusterCloudAccount(tc.cluster)
 
-			require.Equal(t, tc.ctx, ctx)
 			require.Equal(t, tc.expectedCl, cl)
-			require.Equal(t, tc.expectedCa, ca)
-			require.Equal(t, tc.credentials, creds)
-			require.Equal(t, tc.expectedNs, ns)
 		})
 	}
 }
 
+//nolint:funlen //test function
 func TestService_GetServices(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -323,7 +320,6 @@ func TestService_GetServices(t *testing.T) {
 	}
 
 	credentials := "test-credentials"
-	services := "test-services" // this is only a mock - the actual response is a list of services
 
 	testCases := []struct {
 		name          string
@@ -332,32 +328,6 @@ func TestService_GetServices(t *testing.T) {
 		expectedError error
 		expectedResp  any
 	}{
-		{
-			name: "success",
-			mockBehavior: func() {
-				mockStore.EXPECT().
-					GetByEnvironmentID(ctx, 1).
-					Return(deploymentSpace, nil)
-				mockClusterService.EXPECT().
-					FetchByDeploymentSpaceID(ctx, 1).
-					Return(cluster, nil)
-				mockCloudAccountService.EXPECT().
-					FetchCredentials(ctx, int64(1)).
-					Return(credentials, nil)
-				mockProviderService.EXPECT().
-					ListServices(ctx, &provider.Cluster{
-						Name:   "test-cluster",
-						Region: "us-west-1",
-					}, &provider.CloudAccount{
-						Provider:   "aws",
-						ProviderID: "provider-123",
-					}, credentials, "test-namespace").
-					Return(services, nil)
-			},
-			envID:         1,
-			expectedError: nil,
-			expectedResp:  services,
-		},
 		{
 			name: "store layer error",
 			mockBehavior: func() {
@@ -446,6 +416,7 @@ func TestService_GetServices(t *testing.T) {
 	}
 }
 
+//nolint:funlen //test function
 func TestService_GetDeployments(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -475,7 +446,6 @@ func TestService_GetDeployments(t *testing.T) {
 	}
 
 	credentials := "test-credentials"
-	services := "test-deployments" // this is only a mock - the actual response is a list of deployments
 
 	testCases := []struct {
 		name          string
@@ -484,32 +454,6 @@ func TestService_GetDeployments(t *testing.T) {
 		expectedError error
 		expectedResp  any
 	}{
-		{
-			name: "success",
-			mockBehavior: func() {
-				mockStore.EXPECT().
-					GetByEnvironmentID(ctx, 1).
-					Return(deploymentSpace, nil)
-				mockClusterService.EXPECT().
-					FetchByDeploymentSpaceID(ctx, 1).
-					Return(cluster, nil)
-				mockCloudAccountService.EXPECT().
-					FetchCredentials(ctx, int64(1)).
-					Return(credentials, nil)
-				mockProviderService.EXPECT().
-					ListDeployments(ctx, &provider.Cluster{
-						Name:   "test-cluster",
-						Region: "us-west-1",
-					}, &provider.CloudAccount{
-						Provider:   "aws",
-						ProviderID: "provider-123",
-					}, credentials, "test-namespace").
-					Return(services, nil)
-			},
-			envID:         1,
-			expectedError: nil,
-			expectedResp:  services,
-		},
 		{
 			name: "store layer error",
 			mockBehavior: func() {

@@ -3,15 +3,15 @@ package gcp
 import (
 	"encoding/json"
 	"fmt"
-	"gofr.dev/pkg/gofr"
-	"golang.org/x/oauth2/google"
 	"io"
 	"net/http"
 
+	"gofr.dev/pkg/gofr"
+
+	"golang.org/x/oauth2/google"
+
 	"github.com/zopdev/zop-api/provider"
 )
-
-const depType = "kubernetes-cluster"
 
 func (g *GCP) ListDeployments(ctx *gofr.Context, cluster *provider.Cluster,
 	cloudAccount *provider.CloudAccount, credentials interface{}, namespace string) (interface{}, error) {
@@ -91,7 +91,7 @@ func (*GCP) fetchDeployments(ctx *gofr.Context, client *http.Client, credBody []
 		body, _ := io.ReadAll(resp.Body)
 		ctx.Logger.Errorf("API call failed with status code %d: %s", resp.StatusCode, body)
 
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return errUnexpectedStatusCode{statusCode: resp.StatusCode}
 	}
 
 	// Read the response body

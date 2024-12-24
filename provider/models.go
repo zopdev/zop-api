@@ -157,7 +157,7 @@ type Port struct {
 	Protocol   string `json:"protocol"`
 	Port       int    `json:"port"`
 	TargetPort any    `json:"targetPort"`
-	NodePort   string `json:"nodePort"`
+	NodePort   any    `json:"nodePort"`
 }
 
 type Status struct {
