@@ -1,6 +1,6 @@
 module github.com/zopdev/zop-api
 
-go 1.22.8
+go 1.23.0
 
 require (
 	cloud.google.com/go/container v1.42.0
@@ -9,7 +9,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/mock v0.5.0
 	gofr.dev v1.0.3-0.20241220104220-7555317814ec
-	golang.org/x/oauth2 v0.24.0
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/api v0.214.0
 )
 
